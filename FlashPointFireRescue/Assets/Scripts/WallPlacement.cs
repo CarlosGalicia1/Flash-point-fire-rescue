@@ -70,7 +70,7 @@ public class WallPlacement : MonoBehaviour
                 {
                     outer  = (row == 0) ? true : false;
 
-                    CreateWall(cellPosition + new Vector3(0, 0, 0), 90,outer);
+                    CreateWall(cellPosition + new Vector3(0, 0, 5), 90,outer);
                     drawnWalls.Add(row + "," + col + ",0");
                 }
 
@@ -79,7 +79,7 @@ public class WallPlacement : MonoBehaviour
                 {
                     outer = (col == 0) ? true : false;
 
-                    CreateWall(cellPosition + new Vector3(cellHeight, 0, 0), 0, outer);
+                    CreateWall(cellPosition + new Vector3(cellHeight/2, 0, 0), 0, outer);
                     drawnWalls.Add(row + "," + col + ",1");
                 }
 
@@ -88,7 +88,7 @@ public class WallPlacement : MonoBehaviour
                 {
                     outer = (row == rows - 1) ? true : false;
 
-                    CreateWall(cellPosition + new Vector3(cellHeight, 0, 0), 90, outer);
+                    CreateWall(cellPosition + new Vector3(cellHeight, 0, cellWidth/2), 90, outer);
                     drawnWalls.Add(row + "," + col + ",2");
                 }
 
@@ -97,32 +97,32 @@ public class WallPlacement : MonoBehaviour
                 {
                     outer = (col == cols - 1) ? true : false;
 
-                    CreateWall(cellPosition + new Vector3(cellHeight, 0, cellWidth), 0, outer);
+                    CreateWall(cellPosition + new Vector3(cellHeight/2, 0, cellWidth), 0, outer);
                     drawnWalls.Add(row + "," + col + ",3");
                 }
 
                 // Verificar y agregar esquina de pared superior e izquierda
                 if (wallMatrix[row * cols + col, 0] == 1 && wallMatrix[row * cols + col, 1] == 1)
                 {
-                    CreateCorner(cellPosition + new Vector3(0, 0, 0), 90);
+                    CreateCorner(cellPosition + new Vector3(-.5f, cellHeight/2, -.5f), 0);
                 }
 
                 // Verificar y agregar esquina de pared superior y derecha
                 if (wallMatrix[row * cols + col, 0] == 1 && wallMatrix[row * cols + col, 3] == 1)
                 {
-                    CreateCorner(cellPosition + new Vector3(0, 0, cellWidth), 180);
+                    CreateCorner(cellPosition + new Vector3(-.5f, cellHeight / 2, cellWidth - .5f), 0);
                 }
 
                 // Verificar y agregar esquina de pared inferior e izquierda
                 if (wallMatrix[row * cols + col, 2] == 1 && wallMatrix[row * cols + col, 1] == 1)
                 {
-                    CreateCorner(cellPosition + new Vector3(cellHeight, 0, 0), 0);
+                    CreateCorner(cellPosition + new Vector3(cellHeight - .5f, cellHeight/2, -.5f), 0);
                 }
 
                 // Verificar y agregar esquina de pared inferior y derecha
                 if (wallMatrix[row * cols + col, 2] == 1 && wallMatrix[row * cols + col, 3] == 1)
                 {
-                    CreateCorner(cellPosition + new Vector3(cellHeight, 0, cellWidth), -90);
+                    CreateCorner(cellPosition + new Vector3(cellHeight - .5f, cellHeight / 2, cellWidth - .5f), 0);
                 }
 
             }
