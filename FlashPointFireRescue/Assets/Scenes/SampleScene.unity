@@ -419,6 +419,7 @@ GameObject:
   - component: {fileID: 762034378}
   - component: {fileID: 762034379}
   - component: {fileID: 762034380}
+  - component: {fileID: 762034381}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -475,6 +476,24 @@ MonoBehaviour:
   cellWidth: 10
   cellHeight: 10
   wallThickness: 0.1
+--- !u!114 &762034381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 762034377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb0a1006b695ab24dac2bac10c69bffb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smokePrefab: {fileID: 6813416509558619124, guid: 3b7f2c753d435d647a80f1f047a113e3, type: 3}
+  firePrefab: {fileID: 501295248943222296, guid: d6a5e2c4aefa6804b8f7d2af9a9676b5, type: 3}
+  cellWidth: 10
+  cellHeight: 10
+  rows: 6
+  cols: 8
 --- !u!1 &784394027
 GameObject:
   m_ObjectHideFlags: 0
