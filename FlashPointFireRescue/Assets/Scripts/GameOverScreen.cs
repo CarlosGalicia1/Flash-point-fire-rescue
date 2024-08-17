@@ -18,6 +18,14 @@ public class GameOverScreen : MonoBehaviour
         Time.timeScale = 1f; // Reanudar el tiempo del juego
         gameObject.SetActive(false);
         GameManager.isGameOver = false;
+
+        // Reiniciar el tiempo en el TimeManager
+        TimeManager timeManager = FindObjectOfType<TimeManager>();
+        if (timeManager != null)
+        {
+            timeManager.ResetTime();
+        }
+
         // Reiniciar la escena actual
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
