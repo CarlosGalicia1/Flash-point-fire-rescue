@@ -2,23 +2,12 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    private float rotationSpeed = 500.0f;
     private Vector3 mouseWorldPosStart;
-    private float zoomScale = 10.0f;
-    private float zoomMin = 10f;
-    private float zoomMax = 35.0f;
-
-    // Límites del mapa
-    private Vector2 panLimitX = new Vector2(10, 50); // Límite en el eje X
-    private Vector2 panLimitZ = new Vector2(20, 50); // Límite en el eje Z
-
-    // Límites de Rotación
-    public float maxRotationZ = 15f;    
 
     // Update is called once per frame
     void Update()
     {
-        transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, maxRotationZ);
+        transform.eulerAngles = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y, GameConstants.maxRotationZ);
         if (Input.GetKey(KeyCode.Mouse1))
         {
             CamRotate();
@@ -42,7 +31,7 @@ public class CameraController : MonoBehaviour
         if(Input.GetAxis("Mouse Y") != 0 || Input.GetAxis("Mouse X") != 0)
         {
 
-            float horizontalInput = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
+            float horizontalInput = Input.GetAxis("Mouse X") * GameConstants.rotationSpeed * Time.deltaTime;
             transform.Rotate(Vector3.up, horizontalInput, Space.World);
 
 
@@ -58,8 +47,8 @@ public class CameraController : MonoBehaviour
 
             // Limitar el movimiento de la cámara
             Vector3 clampedPosition = transform.position;
-            clampedPosition.x = Mathf.Clamp(clampedPosition.x, panLimitX.x, panLimitX.y);
-            clampedPosition.z = Mathf.Clamp(clampedPosition.z, panLimitZ.x, panLimitZ.y);
+            clampedPosition.x = Mathf.Clamp(clampedPosition.x, GameConstants.panLimitX.x, GameConstants.panLimitX.y);
+            clampedPosition.z = Mathf.Clamp(clampedPosition.z, GameConstants.panLimitZ.x, GameConstants.panLimitZ.y);
 
             transform.position = clampedPosition;
         }
@@ -70,7 +59,7 @@ public class CameraController : MonoBehaviour
         if(zoomDiff != 0)
         {
             mouseWorldPosStart = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize - zoomDiff * zoomScale, zoomMin, zoomMax);
+            Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize - zoomDiff * GameConstants.zoomScale, GameConstants.zoomMin, GameConstants.zoomMax);
             Vector3 mouseWorldPosDiff = mouseWorldPosStart - Camera.main.ScreenToWorldPoint(Input.mousePosition);
             transform.position += mouseWorldPosDiff;
         }
