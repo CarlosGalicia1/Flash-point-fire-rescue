@@ -29,7 +29,7 @@ public class POIManager : MonoBehaviour
 
     void CreatePOI(int file, int column, string poiType)
     {
-        float x = 2f + (file * (10f));
+        float x = 2f + ((file - 1f) * (10f));
         float y = 2f;
         float z = 5f + ((column - 1f) * 10f);
 
