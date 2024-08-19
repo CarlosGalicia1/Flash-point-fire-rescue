@@ -33,7 +33,6 @@ public class DoorHealth : MonoBehaviour
 
     private void SetDestroy()
     {
-        GameConstants.damageCounter++;
 
         GridElementManager gridElementManager = FindObjectOfType<GridElementManager>();
         if (gridElementManager != null)

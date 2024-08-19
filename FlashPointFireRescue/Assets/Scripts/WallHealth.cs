@@ -42,7 +42,7 @@ public class WallHealth : MonoBehaviour
             Destroy(gameObject);
         }
 
-        // Terminar la simulación si el contador de daño alcanza el valor maximo permitido
+        // Terminar la simulaciï¿½n si el contador de daï¿½o alcanza el valor maximo permitido
         if (GameConstants.damageCounter >= GameConstants.maxDamage)
         {
             EndSimulation();

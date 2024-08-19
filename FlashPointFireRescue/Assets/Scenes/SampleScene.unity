@@ -2540,6 +2540,7 @@ GameObject:
   m_Component:
   - component: {fileID: 762034378}
   - component: {fileID: 762034380}
+  - component: {fileID: 762034381}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -2578,6 +2579,25 @@ MonoBehaviour:
   wallWindowPrefab: {fileID: 2670981378253362000, guid: c97807e682897a741909f71ecc6ff3f4, type: 3}
   wallCornerPrefab: {fileID: 6546195225663131131, guid: c65fa09fdc546ef43a5add72ae6af690, type: 3}
   doorWallPrefab: {fileID: 218228737328147401, guid: 8a5005ab099bddd48a39009d0af238b2, type: 3}
+  rows: 6
+  cols: 8
+  cellWidth: 10
+  cellHeight: 10
+  wallThickness: 0.1
+--- !u!114 &762034381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 762034377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c15b69c73466c3641a3445654d906c8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  questionPrefab: {fileID: 2162839496276690756, guid: 8fab5e42e03ee4d40b4f0d9ae33d522e, type: 3}
+  poiRotation: {x: -90, y: 0, z: -90}
 --- !u!1 &784394027
 GameObject:
   m_ObjectHideFlags: 0
