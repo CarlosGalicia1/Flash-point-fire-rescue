@@ -25,7 +25,7 @@ public class POIManager : MonoBehaviour
     // private int POIVictims = 12;
 
     private float floatSpeed = 1.5f;
-    private float floatAmplitude = 2f;
+    private float floatAmplitude = 1.8f;
 
     void CreatePOI(int file, int column, string poiType)
     {
