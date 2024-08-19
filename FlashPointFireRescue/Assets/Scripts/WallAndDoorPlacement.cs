@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 public class WallAndDoorPlacement : MonoBehaviour
 {
@@ -9,13 +8,6 @@ public class WallAndDoorPlacement : MonoBehaviour
     public GameObject wallCornerPrefab; // Prefab de la esquina de la pared
     public GameObject doorWallPrefab; // Prefab de la puerta 
 
-    public int rows = 6; // Número de filas
-    public int cols = 8; // Número de columnas
-
-    public float cellWidth = 10f; // Ancho de cada celda
-    public float cellHeight = 10f; // Altura de cada celda
-
-    public float wallThickness = 0.1f; // Grosor de la pared
     private HashSet<string> drawnWalls = new HashSet<string>();
 
     private string matrixStrInput = @"
@@ -56,19 +48,13 @@ public class WallAndDoorPlacement : MonoBehaviour
 
         int[,] wallMatrix = StringToMatrix(matrixStrInput);
         PlaceWalls(wallMatrix);
-
-        foreach (var wall in drawnWalls)
-        {
-            Debug.Log($"Wall: {wall}");
-        }
-
     }
 
     int[,] StringToMatrix(string matrixStr) // Transformar el string a matriz de arreglos de 4 elementos
     {
         string[] lines = matrixStr.Trim().Split('\n');
         
-        int[,] wallMatrix = new int[rows * cols, 4];
+        int[,] wallMatrix = new int[GameConstants.rows * GameConstants.cols, 4];
 
         for (int i = 0; i < lines.Length; i++)
         {
@@ -77,7 +63,7 @@ public class WallAndDoorPlacement : MonoBehaviour
             {
                 for (int k = 0; k < 4; k++)
                 {
-                    wallMatrix[i * cols + j, k] = int.Parse(elements[j][k].ToString());
+                    wallMatrix[i * GameConstants.cols + j, k] = int.Parse(elements[j][k].ToString());
                 }
             }
         }
@@ -124,68 +110,68 @@ public class WallAndDoorPlacement : MonoBehaviour
     {
         
 
-        for (int row = 0; row < rows; row++)
+        for (int row = 0; row < GameConstants.rows; row++)
         {
-            for (int col = 0; col < cols; col++)
+            for (int col = 0; col < GameConstants.cols; col++)
             {
-                Vector3 cellPosition = new Vector3(row * cellWidth, 0, col * cellHeight);
+                Vector3 cellPosition = new Vector3(row * GameConstants.cellWidth, 0, col * GameConstants.cellHeight);
 
                 bool outer = false;
 
                 // Verificar y agregar paredes arriba
-                if (wallMatrix[row * cols + col, 0] == 1 && !drawnWalls.Contains((row - 1) + "," + col + ",2") && !drawnWalls.Contains(row + "," + col + ",0"))
+                if (wallMatrix[row * GameConstants.cols + col, 0] == 1 && !drawnWalls.Contains((row - 1) + "," + col + ",2") && !drawnWalls.Contains(row + "," + col + ",0"))
                 {
                     outer  = (row == 0) ? true : false;
-                    CreateWall(cellPosition + new Vector3(0, 0, 5), 90,outer);
+                    CreateWall(cellPosition + new Vector3(0, 0, GameConstants.cellWidth/2), 90,outer);
                     drawnWalls.Add(row + "," + col + ",0");
                 }
 
                 // Verificar y agregar paredes izquierda
-                if (wallMatrix[row * cols + col, 1] == 1 && !drawnWalls.Contains(row + "," + (col - 1) + ",3") && !drawnWalls.Contains(row + "," + col + ",1"))
+                if (wallMatrix[row * GameConstants.cols + col, 1] == 1 && !drawnWalls.Contains(row + "," + (col - 1) + ",3") && !drawnWalls.Contains(row + "," + col + ",1"))
                 {
                     outer = (col == 0) ? true : false;
-                    CreateWall(cellPosition + new Vector3(cellHeight/2, 0, 0), 0, outer);
+                    CreateWall(cellPosition + new Vector3(GameConstants.cellHeight/2, 0, GameConstants.wallThickness), 0, outer);
                     drawnWalls.Add(row + "," + col + ",1");
                 }
 
                 // Verificar y agregar paredes abajo
-                if (wallMatrix[row * cols + col, 2] == 1 && !drawnWalls.Contains((row + 1) + "," + col + ",0") && !drawnWalls.Contains(row + "," + col + ",2"))
+                if (wallMatrix[row * GameConstants.cols + col, 2] == 1 && !drawnWalls.Contains((row + 1) + "," + col + ",0") && !drawnWalls.Contains(row + "," + col + ",2"))
                 {
-                    outer = (row == rows - 1) ? true : false;
-                    CreateWall(cellPosition + new Vector3(cellHeight, 0, cellWidth/2), 90, outer);
+                    outer = (row == GameConstants.rows - 1) ? true : false;
+                    CreateWall(cellPosition + new Vector3(GameConstants.cellHeight, 0, GameConstants.cellWidth/2), 90, outer);
                     drawnWalls.Add(row + "," + col + ",2");
                 }
 
                 // Verificar y agregar paredes derecha
-                if (wallMatrix[row * cols + col, 3] == 1 && !drawnWalls.Contains(row + "," + (col + 1) + ",1") && !drawnWalls.Contains(row + "," + col + ",3"))
+                if (wallMatrix[row * GameConstants.cols + col, 3] == 1 && !drawnWalls.Contains(row + "," + (col + 1) + ",1") && !drawnWalls.Contains(row + "," + col + ",3"))
                 {
-                    outer = (col == cols - 1) ? true : false;
-                    CreateWall(cellPosition + new Vector3(cellHeight/2, 0, cellWidth), 0, outer);
+                    outer = (col == GameConstants.cols - 1) ? true : false;
+                    CreateWall(cellPosition + new Vector3(GameConstants.cellHeight/2, 0, GameConstants.cellWidth + GameConstants.wallThickness), 0, outer);
                     drawnWalls.Add(row + "," + col + ",3");
                 }
 
                 // Verificar y agregar esquina de pared superior e izquierda
-                if (wallMatrix[row * cols + col, 0] == 1 && wallMatrix[row * cols + col, 1] == 1)
+                if (wallMatrix[row * GameConstants.cols + col, 0] == 1 && wallMatrix[row * GameConstants.cols + col, 1] == 1)
                 {
-                    CreateCorner(cellPosition + new Vector3(-.5f, cellHeight/2, -.5f), 0);
+                    CreateCorner(cellPosition + new Vector3(-GameConstants.wallThickness, GameConstants.cellHeight/2, 0), 0);
                 }
 
                 // Verificar y agregar esquina de pared superior y derecha
-                if (wallMatrix[row * cols + col, 0] == 1 && wallMatrix[row * cols + col, 3] == 1)
+                if (wallMatrix[row * GameConstants.cols + col, 0] == 1 && wallMatrix[row * GameConstants.cols + col, 3] == 1)
                 {
-                    CreateCorner(cellPosition + new Vector3(-.5f, cellHeight / 2, cellWidth - .5f), 0);
+                    CreateCorner(cellPosition + new Vector3(-GameConstants.wallThickness, GameConstants.cellHeight / 2, GameConstants.cellWidth), 0);
                 }
 
                 // Verificar y agregar esquina de pared inferior e izquierda
-                if (wallMatrix[row * cols + col, 2] == 1 && wallMatrix[row * cols + col, 1] == 1)
+                if (wallMatrix[row * GameConstants.cols + col, 2] == 1 && wallMatrix[row * GameConstants.cols + col, 1] == 1)
                 {
-                    CreateCorner(cellPosition + new Vector3(cellHeight - .5f, cellHeight/2, -.5f), 0);
+                    CreateCorner(cellPosition + new Vector3(GameConstants.cellHeight - GameConstants.wallThickness, GameConstants.cellHeight/2, 0), 0);
                 }
 
                 // Verificar y agregar esquina de pared inferior y derecha
-                if (wallMatrix[row * cols + col, 2] == 1 && wallMatrix[row * cols + col, 3] == 1)
+                if (wallMatrix[row * GameConstants.cols + col, 2] == 1 && wallMatrix[row * GameConstants.cols + col, 3] == 1)
                 {
-                    CreateCorner(cellPosition + new Vector3(cellHeight - .5f, cellHeight / 2, cellWidth - .5f), 0);
+                    CreateCorner(cellPosition + new Vector3(GameConstants.cellHeight - GameConstants.wallThickness, GameConstants.cellHeight / 2, GameConstants.cellWidth), 0);
                 }
 
             }
@@ -210,13 +196,13 @@ public class WallAndDoorPlacement : MonoBehaviour
             if (row1 != row2)
             {
                 rotationY = 90;
-                doorPosition = new Vector3((row1 * cellWidth), 0, (col1 * cellHeight) -5);
+                doorPosition = new Vector3((row1 * GameConstants.cellWidth), 0, (col1 * GameConstants.cellHeight) -5 );
                 drawnWalls.Add((row1 - 1) + "," + (col1 - 1) + ",2");
             }
             else
             {
                 rotationY = 0;
-                doorPosition = new Vector3((row1 * cellWidth) - 5, 0, col1 * cellHeight);
+                doorPosition = new Vector3((row1 * GameConstants.cellWidth) - 5, 0, col1 * GameConstants.cellHeight + GameConstants.wallThickness);
                 drawnWalls.Add((row1 - 1) + "," + (col1 - 1) + ",3");
             }
 
@@ -233,32 +219,32 @@ public class WallAndDoorPlacement : MonoBehaviour
             int row = entryMatrix[i, 0];
             int col = entryMatrix[i, 1];
 
-            Vector3 entryPosition = new Vector3(row * cellWidth, 0, col * cellHeight);
+            Vector3 entryPosition = new Vector3(row * GameConstants.cellWidth, 0, col * GameConstants.cellHeight);
             float rotationY = 0f;
 
             // Ajustar la rotación según la ubicación de la entrada
             if (row == 1)
             {
                 rotationY = 90f; // Entrada superior
-                entryPosition = new Vector3((row -1) * cellWidth, 0, (col * cellHeight) - 5);
+                entryPosition = new Vector3((row -1) * GameConstants.cellWidth, 0, (col * GameConstants.cellHeight) - 5);
                 drawnWalls.Add((row-1) + "," + (col-1) + ",0");
             }
-            else if (row == rows)
+            else if (row == GameConstants.rows)
             {
                 rotationY = -90f; // Entrada inferior
-                entryPosition = new Vector3((row * cellWidth) - 1, 0, (col * cellHeight) - 5);
+                entryPosition = new Vector3((row * GameConstants.cellWidth) - 1, 0, (col * GameConstants.cellHeight) - 5);
                 drawnWalls.Add((row - 1) + "," + (col - 1) + ",2");
             }
             else if (col == 1)
             {
                 rotationY = 0f; // Entrada izquierda
-                entryPosition = new Vector3((row * cellWidth) - 5, 0, (col -1) * cellHeight);
+                entryPosition = new Vector3((row * GameConstants.cellWidth) - 5, 0, (col -1) * GameConstants.cellHeight + GameConstants.wallThickness);
                 drawnWalls.Add((row - 1) + "," + (col - 1) + ",1");
             }
-            else if (col == cols)
+            else if (col == GameConstants.cols)
             {
                 rotationY = -180f; // Entrada derecha
-                entryPosition = new Vector3((row * cellWidth) - 5, 0, col * cellHeight - 1);
+                entryPosition = new Vector3((row * GameConstants.cellWidth) - 5, 0, col * GameConstants.cellHeight - 1 + GameConstants.wallThickness);
                 drawnWalls.Add((row - 1) + "," + (col - 1) + ",3");
             }
 
