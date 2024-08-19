@@ -15,7 +15,9 @@ public class GameOverScreen : MonoBehaviour
     }
     public void RestartGame()
     {
-        Time.timeScale = 1f; // Reanudar el tiempo del juego
+        GameConstants.Reset();
+
+        Time.timeScale = GameConstants.minuteToRealTime; // Reanudar el tiempo del juego
         gameObject.SetActive(false);
         GameManager.isGameOver = false;
 

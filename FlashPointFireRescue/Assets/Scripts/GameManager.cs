@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     {
         isGameOver = true;
         // Pasar el valor del contador de daño al GameOverScreen
-        gameOverScreen.Setup(DoorHealth.damageCounter);
+        gameOverScreen.Setup(GameConstants.damageCounter);
         Time.timeScale = 0f; // Detener el tiempo del juego
     }
 

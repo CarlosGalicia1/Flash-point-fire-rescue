@@ -97,6 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9564395d4ff8db42aef7a82cdb29dd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doorOpenedPrefab: {fileID: 3477072892241167151, guid: 94e38a3944c19fa458fc12a230b6f435, type: 3}
 --- !u!65 &-8241374920151135404
 BoxCollider:
   m_ObjectHideFlags: 0

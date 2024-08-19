@@ -2,15 +2,12 @@ using UnityEngine;
 
 public class WallHealth : MonoBehaviour
 {
-    public int maxHealth = 4; // Puntos de resistencia máxima
-    public Material damagedMaterial; // Material para cuando la resistencia es 2
-
     private int currentHealth; // Resistencia actual
     private Renderer objectRenderer; // Renderer del objeto para cambiar materiales
 
     void Start()
     {
-        currentHealth = maxHealth;
+        currentHealth = GameConstants.maxHealth;
         objectRenderer = GetComponent<Renderer>();
     }
 
@@ -18,20 +15,25 @@ public class WallHealth : MonoBehaviour
     {
         if (GameManager.isGameOver) return; // No hacer nada si el juego ha terminado
 
-        TakeDamage(2);
-
+        TakeDamage(GameConstants.explosionDamage);
     }
 
     private void TakeDamage(int damage)
     {
-        // Disminuir la resistencia en 2 al hacer clic
-        currentHealth -= 2;
-        DoorHealth.damageCounter++;
+        // Disminuir la resistencia al hacer clic
+        currentHealth -= damage;
+        GameConstants.damageCounter++;
+
+        GridElementManager gridElementManager = FindObjectOfType<GridElementManager>();
+        if (gridElementManager != null)
+        {
+            gridElementManager.UpdateGridElements(GameConstants.damageCounter);
+        }
 
         // Verificar si la resistencia es igual a 2
         if (currentHealth == 2)
         {
-            objectRenderer.material = damagedMaterial;
+            objectRenderer.material = GameConstants.damagedMaterial;
         }
 
         // Verificar si la resistencia es 0 o menos
@@ -40,15 +42,16 @@ public class WallHealth : MonoBehaviour
             Destroy(gameObject);
         }
 
-        // Terminar la simulación si el contador de daño alcanza 24
-        if (DoorHealth.damageCounter >= DoorHealth.maxDamage)
+        // Terminar la simulación si el contador de daño alcanza el valor maximo permitido
+        if (GameConstants.damageCounter >= GameConstants.maxDamage)
         {
-            DoorHealth doorHealth = FindObjectOfType<DoorHealth>();
-
-            if (doorHealth != null)
-            {
-                doorHealth.EndSimulation();
-            }
+            EndSimulation();
         }
+    }
+    public void EndSimulation()
+    {
+        // Detiene el juego o realiza las acciones necesarias
+        GameManager gameManager = FindObjectOfType<GameManager>();
+        gameManager.EndGame(); // Llamar a EndGame en lugar de Application.Quit()
     }
 }
