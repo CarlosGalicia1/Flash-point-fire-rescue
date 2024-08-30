@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fcdb7a99237c6417a9e5766d641a824c, type: 2}
+  - {fileID: 2100000, guid: 1b6e9c2f40b516e44827119f427be5e2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -97,6 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9564395d4ff8db42aef7a82cdb29dd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doorOpenedPrefab: {fileID: 3477072892241167151, guid: 94e38a3944c19fa458fc12a230b6f435, type: 3}
 --- !u!65 &-8241374920151135404
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -3,26 +3,44 @@ using UnityEngine;
 public class DoorHealth : MonoBehaviour
 {
 
-    public static int damageCounter = 0; // Contador de daño
-    public static int maxDamage = 24; // Daño máximo antes de terminar la simulación
+    public GameObject doorOpenedPrefab; // Prefab del objeto DoorOpened
 
-    void Start()
+    void Update()
     {
-        damageCounter = 0; // Contador de daño
+        if (Input.GetMouseButtonDown(1) && !GameManager.isGameOver) // Click derecho
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
+            {
+                if (hit.transform == transform)
+                {
+                    SwapToOpenedDoor();
+                }
+            }
+        }
     }
 
     void OnMouseDown()
     {
+
         if (GameManager.isGameOver) return; // No hacer nada si el juego ha terminado
 
-        SetDestroy();
+        if (Input.GetMouseButtonDown(0)) // Click izquierdo
+        {
+            SetDestroy();
+        }
     }
 
     private void SetDestroy()
     {
-        damageCounter++;
 
-        if (damageCounter >= maxDamage)
+        GridElementManager gridElementManager = FindObjectOfType<GridElementManager>();
+        if (gridElementManager != null)
+        {
+            gridElementManager.UpdateGridElements(GameConstants.damageCounter);
+        }
+
+        if (GameConstants.damageCounter >= GameConstants.maxDamage)
         {
             EndSimulation();
         }
@@ -31,9 +49,17 @@ public class DoorHealth : MonoBehaviour
 
     public void EndSimulation()
     {
-        Debug.Log("¡Simulación terminada! El contador de daño ha alcanzado el máximo permitido.");
         // Detiene el juego o realiza las acciones necesarias
         GameManager gameManager = FindObjectOfType<GameManager>();
         gameManager.EndGame(); // Llamar a EndGame en lugar de Application.Quit()
+    }
+
+    private void SwapToOpenedDoor()
+    {
+        Vector3 position = transform.position;
+        Quaternion rotation = transform.rotation;
+
+        Instantiate(doorOpenedPrefab, position, rotation);
+        Destroy(gameObject); // Destruye el objeto Door actual
     }
 }

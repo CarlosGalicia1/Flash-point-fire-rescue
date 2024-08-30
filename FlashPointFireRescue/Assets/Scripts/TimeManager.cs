@@ -9,7 +9,6 @@ public class TimeManager : MonoBehaviour
     public static int Minute { get; private set; }
     public static int Hour { get; private set; }
 
-    private float minuteToRealTime = 1f;
     private float timer;
 
     // Update is called once per frame
@@ -30,7 +29,7 @@ public class TimeManager : MonoBehaviour
                 Minute = 0;
             }
 
-            timer = minuteToRealTime;
+            timer = GameConstants.minuteToRealTime;
         }
     }
 
@@ -38,6 +37,6 @@ public class TimeManager : MonoBehaviour
     {
         Minute = 0;
         Hour = 0;
-        timer = minuteToRealTime;
+        timer = GameConstants.minuteToRealTime;
     }
 }
