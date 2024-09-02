@@ -7,16 +7,26 @@ public class Tile
     private Wall wall;
     private int fireStatus;
     private bool hasPOI;
-    private bool isVictime;
+    private int numberVictims;
+    List<int> fireFighters;
     
-    public Tile(int top, int left, int bottom, int right, int isDoor, bool isOpen=false)
+    public Tile(
+        int top, int left, int bottom, int right, bool isOpen, 
+        int topHealth, int leftHealth, int bottomHealth, int rightHealth, 
+        int fireStatus, bool hasPOI, int numberVictims, List<int> fireFighters)
     {
-        this.wall = new Wall(top, left, bottom, right, isDoor, isOpen);
-        this.fireStatus = 0;
-        this.hasPOI = false;
-        this.isVictime = false;
+        this.wall = new Wall(top, left, bottom, right, isOpen, topHealth, leftHealth, bottomHealth, rightHealth);
+        this.fireStatus = fireStatus;
+        this.hasPOI = hasPOI;
+        this.numberVictims = numberVictims;
+        this.fireFighters = fireFighters;
     }
 
+    public Wall getWall()
+    {
+        return this.wall;
+    }
+    
     public int getFireStatus()
     {
         return this.fireStatus;
@@ -27,9 +37,14 @@ public class Tile
         return this.hasPOI;
     }
 
-    public bool getIsVictime()
+    public int getNumberVictims()
     {
-        return this.isVictime;
+        return this.numberVictims;
+    }
+
+    public List<int> getFireFighters()
+    {
+        return this.fireFighters;
     }
     
     public void setFireStatus(int fireStatus)
@@ -42,10 +57,14 @@ public class Tile
         this.hasPOI = hasPOI;
     }
 
-    public void setIsVictime(bool isVictime)
+    public void setNumberVictims(int numberVictims)
     {
-        this.isVictime = isVictime;
+        this.numberVictims = numberVictims;
     }
 
+    public void setFireFighters(List<int> fireFighters)
+    {
+        this.fireFighters = fireFighters;
+    }
     
 }
