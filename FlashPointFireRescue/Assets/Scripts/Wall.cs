@@ -8,34 +8,23 @@ public class Wall
     private int left;
     private int bottom;
     private int right;
-    private int isDoor;
     private bool isOpen;
+    private int topHealth;
+    private int leftHealth;
+    private int bottomHealth;
+    private int rightHealth;
 
-    public Wall(int top, int left, int bottom, int right, int isDoor, bool isOpen=false)
+    public Wall(int top, int left, int bottom, int right, bool isOpen, int topHealth, int leftHealth, int bottomHealth, int rightHealth)
     {
         this.top = top;
         this.left = left;
         this.bottom = bottom;
         this.right = right;
-        this.isDoor = isDoor;
         this.isOpen = isOpen;
-
-        if (isDoor == 1)
-        {
-            this.top = 2;
-        }
-        else if (isDoor == 2)
-        {
-            this.left = 2;
-        }
-        else if (isDoor == 3)
-        {
-            this.bottom = 2;
-        }
-        else if (isDoor == 4)
-        {
-            this.right = 2;
-        }
+        this.topHealth = topHealth;
+        this.leftHealth = leftHealth;
+        this.bottomHealth = bottomHealth;
+        this.rightHealth = rightHealth;
     }
     
     public int getTop()
@@ -58,14 +47,29 @@ public class Wall
         return this.right;
     }
 
-    public int getIsDoor()
-    {
-        return this.isDoor;
-    }
-
     public bool getIsOpen()
     {
         return this.isOpen;
+    }
+
+    public int getTopHealth()
+    {
+        return this.topHealth;
+    }
+
+    public int getLeftHealth()
+    {
+        return this.leftHealth;
+    }
+
+    public int getBottomHealth()
+    {
+        return this.bottomHealth;
+    }
+
+    public int getRightHealth()
+    {
+        return this.rightHealth;
     }
 
     public void setTop(int top)
@@ -88,13 +92,28 @@ public class Wall
         this.right = right;
     }
 
-    public void setIsDoor(int isDoor)
-    {
-        this.isDoor = isDoor;
-    }
-
     public void setIsOpen(bool isOpen)
     {
         this.isOpen = isOpen;
+    }
+
+    public void setTopHealth(int topHealth)
+    {
+        this.topHealth = topHealth;
+    }
+
+    public void setLeftHealth(int leftHealth)
+    {
+        this.leftHealth = leftHealth;
+    }
+
+    public void setBottomHealth(int bottomHealth)
+    {
+        this.bottomHealth = bottomHealth;
+    }
+
+    public void setRightHealth(int rightHealth)
+    {
+        this.rightHealth = rightHealth;
     }
 }

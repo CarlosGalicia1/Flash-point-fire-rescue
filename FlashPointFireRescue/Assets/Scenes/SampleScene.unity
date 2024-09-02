@@ -2542,6 +2542,7 @@ GameObject:
   - component: {fileID: 762034380}
   - component: {fileID: 762034381}
   - component: {fileID: 762034382}
+  - component: {fileID: 762034383}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -2580,6 +2581,8 @@ MonoBehaviour:
   wallWindowPrefab: {fileID: 2670981378253362000, guid: c97807e682897a741909f71ecc6ff3f4, type: 3}
   wallCornerPrefab: {fileID: 6546195225663131131, guid: c65fa09fdc546ef43a5add72ae6af690, type: 3}
   doorWallPrefab: {fileID: 218228737328147401, guid: 8a5005ab099bddd48a39009d0af238b2, type: 3}
+  smokePrefab: {fileID: 6813416509558619124, guid: 3b7f2c753d435d647a80f1f047a113e3, type: 3}
+  firePrefab: {fileID: 501295248943222296, guid: d6a5e2c4aefa6804b8f7d2af9a9676b5, type: 3}
 --- !u!114 &762034381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2643,6 +2646,18 @@ MonoBehaviour:
   worldFloor: {fileID: 1758143974}
   maxSpawnAttempts: 30
   bufferZone: 5
+--- !u!114 &762034383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 762034377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5988749ea68878449b908cbaf55a975c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &784394027
 GameObject:
   m_ObjectHideFlags: 0
