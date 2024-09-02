@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Newtonsoft.Json;
 
 public class WebClient : MonoBehaviour
 {
@@ -32,6 +33,50 @@ public class WebClient : MonoBehaviour
             }
             else
             {
+                string jsonResponse = www.downloadHandler.text;
+                Dictionary<string, Tile> dictString = JsonConvert.DeserializeObject<Dictionary<string, Tile>>(jsonResponse);
+                Dictionary<Vector2Int, Tile> houseFire = new Dictionary<Vector2Int, Tile>();
+
+                foreach (KeyValuePair<string, Tile> entry in dictString)
+                {
+                    string[] key = entry.Key.Split(',');
+                    Vector2Int gridPosition = new Vector2Int(int.Parse(key[0]), int.Parse(key[1]));
+                    Tile tile = entry.Value;
+                    houseFire.Add(gridPosition, tile);
+                }
+
+                foreach (KeyValuePair<Vector2Int, Tile> entry in houseFire)
+                {
+                    Vector2Int gridPosition = entry.Key;
+                    Tile tile = entry.Value;
+                    Debug.Log("Key: " + gridPosition + " Value: " + tile);
+                }
+
+                WallAndDoorPlacement wallAndDoor = FindObjectOfType<WallAndDoorPlacement>();
+                wallAndDoor.setDictionary(houseFire);
+                wallAndDoor.PlaceWalls();
+
+                Debug.Log("Form upload complete!");
+                // wallAndDoor.ReceiveData(result);
+                //Vector3 tPos = JsonUtility.FromJson<Vector3>(www.downloadHandler.text.Replace('\'', '\"'));
+
+
+                /*
+                string jsonResponse = www.downloadHandler.text;
+
+                Debug.Log("JsonResponse" + jsonResponse); 
+
+                // Dividir el string por la palabra "data"
+                string[] initial = jsonResponse.Substring(1, jsonResponse.Length - 2).Split(new string[] { "type" }, StringSplitOptions.None);
+
+                // Mostrar las partes divididas
+                foreach (string part in initial)
+                {
+                    Debug.Log(part);
+                }
+
+                FixString(initial[1]);
+                
                 Debug.Log(www.downloadHandler.text);    // Answer from Python
                 string tPos = www.downloadHandler.text;
                 
@@ -39,6 +84,7 @@ public class WebClient : MonoBehaviour
                 wallAndDoor.ReceiveData(tPos);
                 //Vector3 tPos = JsonUtility.FromJson<Vector3>(www.downloadHandler.text.Replace('\'', '\"'));
                 Debug.Log("Form upload complete!");
+                */
             }
         }
 
@@ -60,5 +106,16 @@ public class WebClient : MonoBehaviour
     void Update()
     {
         
+    }
+
+    void FixString(string str)
+    {
+        int startIndex = str.IndexOf('{');
+        int endIndex = str.LastIndexOf('}');
+
+        // Obtiene el substring desde el primer '{' hasta el último '}'
+        string result = str.Substring(startIndex, endIndex - startIndex + 1);
+        WallAndDoorPlacement wallAndDoor = FindObjectOfType<WallAndDoorPlacement>();
+        wallAndDoor.ReceiveData(result);
     }
 }

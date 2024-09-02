@@ -1,11 +1,16 @@
 using UnityEngine;
 using System;
 using System.Text;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Vector3 = UnityEngine.Vector3;
+using Quaternion = UnityEngine.Quaternion;
 
 public class WallAndDoorPlacement : MonoBehaviour
 {
+    public GameObject questionPrefab;
+    [SerializeField] private Vector3 poiRotation = Vector3.zero;
     public GameObject wallPrefab;       // Prefab de la pared
     public GameObject wallWindowPrefab; // Prefab de la pared con ventana
     public GameObject wallCornerPrefab; // Prefab de la esquina de la pared
@@ -14,35 +19,13 @@ public class WallAndDoorPlacement : MonoBehaviour
     public GameObject firePrefab;       // Prefab del fuego
     private Dictionary<Vector2Int, Tile> tileDict; // Matriz de las paredes y puertas
     private HashSet<string> drawnWalls = new HashSet<string>();
+    private float floatSpeed = 1.5f;
+    private float floatAmplitude = 1.8f;
 
-    private string matrixStrInput = @"
-1100 1000 1001 1100 1001 1100 1000 1001
-0100 0000 0011 0110 0011 0110 0010 0001
-0100 0001 1100 1000 1000 1001 1100 1001
-0110 0011 0110 0010 0010 0011 0110 0011
-1100 1000 1000 1000 1001 1100 1001 1101
-0110 0010 0010 0010 0011 0110 0011 0111
-";
-
-    private string doorsStrInput = @"
-1 3 1 4
-2 5 2 6
-2 8 3 8
-3 2 3 3 
-4 4 5 4
-4 6 4 7
-6 5 6 6
-6 7 6 8
-";
-
-    private string entryPointsStrInput = @"
-1 6
-3 1
-4 8
-6 3
-";
-
-    
+    public void setDictionary(Dictionary<Vector2Int, Tile> tileDict)
+    {
+        this.tileDict = tileDict;
+    }
     
     public void ReceiveData(string matrixStr)
     {
@@ -123,10 +106,9 @@ public class WallAndDoorPlacement : MonoBehaviour
             }
             
         }
-        PlaceWalls1(tileDict);
     }
-
-    void PlaceWalls1(Dictionary<Vector2Int, Tile> tileDict)
+    
+    public void PlaceWalls()
     {
         foreach (KeyValuePair<Vector2Int, Tile> kvp in tileDict)
         {
@@ -270,8 +252,6 @@ public class WallAndDoorPlacement : MonoBehaviour
                 }
             }
 
-            CheckCorners(tile, cellPosition);
-
             if (tile.getFireStatus() != 0)
             {
                 float x = ((positionX) * GameConstants.cellWidth) + (GameConstants.cellWidth / 2);
@@ -285,6 +265,14 @@ public class WallAndDoorPlacement : MonoBehaviour
                     SpawnFire(x, z);
                 }
             }
+
+            if (tile.getHasPOI())
+            {
+                CreatePOI(positionX + 1, positionY + 1);
+            }
+
+            CheckCorners(tile, cellPosition);
+
         }
     }
 
@@ -344,115 +332,7 @@ public class WallAndDoorPlacement : MonoBehaviour
         Vector3 spawnPosition = new Vector3(x, 2f, z);
         Instantiate(firePrefab, spawnPosition, Quaternion.identity);
     }
-
-    int[,] StringToDoorMatrix(string doorsStr)
-    {
-        string[] lines = doorsStr.Trim().Split('\n');
-        int[,] doorMatrix = new int[lines.Length, 4];
-
-        for (int i = 0; i < lines.Length; i++)
-        {
-            string[] elements = lines[i].Trim().Split(' ');
-            for (int j = 0; j < elements.Length; j++)
-            {
-                doorMatrix[i, j] = int.Parse(elements[j]);
-            }
-        }
-
-        return doorMatrix;
-    }
-
-    int[,] StringTOEntryMatrix(string entryStr)
-    {
-        string[] lines = entryStr.Trim().Split('\n');
-        int[,] entryMatrix = new int[lines.Length, 2];
-
-        for (int i = 0; i < lines.Length; i++)
-        {
-            string[] elements = lines[i].Trim().Split(' ');
-            for (int j = 0; j < elements.Length; j++)
-            {
-                entryMatrix[i, j] = int.Parse(elements[j]);
-            }
-        }
-
-        return entryMatrix;
-    }
-
-
-    void PlaceDoors(int[,] doorMatrix)
-    {
-        int doorCount = doorMatrix.GetLength(0); // N�mero de filas en la matriz
-
-        for (int i = 0; i < doorCount; i++)
-        {
-            int row1 = doorMatrix[i, 0]; // El -1 es para ajustar el �ndice
-            int col1 = doorMatrix[i, 1];
-            int row2 = doorMatrix[i, 2];
-            int col2 = doorMatrix[i, 3];
-
-            Vector3 doorPosition;
-            float rotationY;
-
-            if (row1 != row2)
-            {
-                rotationY = 90;
-                doorPosition = new Vector3((row1 * GameConstants.cellWidth), 0, (col1 * GameConstants.cellHeight) -5 );
-                drawnWalls.Add((row1 - 1) + "," + (col1 - 1) + ",2");
-            }
-            else
-            {
-                rotationY = 0;
-                doorPosition = new Vector3((row1 * GameConstants.cellWidth) - 5, 0, col1 * GameConstants.cellHeight + GameConstants.wallThickness);
-                drawnWalls.Add((row1 - 1) + "," + (col1 - 1) + ",3");
-            }
-
-            CreateDoor(doorPosition, rotationY);
-        }
-    }
-
-    void PlaceEntryPoints(int[,] entryMatrix)
-    {
-        int entryCount = entryMatrix.GetLength(0);
-
-        for (int i = 0; i < entryCount; i++)
-        {
-            int row = entryMatrix[i, 0];
-            int col = entryMatrix[i, 1];
-
-            Vector3 entryPosition = new Vector3(row * GameConstants.cellWidth, 0, col * GameConstants.cellHeight);
-            float rotationY = 0f;
-
-            // Ajustar la rotaci�n seg�n la ubicaci�n de la entrada
-            if (row == 1)
-            {
-                rotationY = 90f; // Entrada superior
-                entryPosition = new Vector3((row -1) * GameConstants.cellWidth, 0, (col * GameConstants.cellHeight) - 5);
-                drawnWalls.Add((row-1) + "," + (col-1) + ",0");
-            }
-            else if (row == GameConstants.rows)
-            {
-                rotationY = -90f; // Entrada inferior
-                entryPosition = new Vector3((row * GameConstants.cellWidth) - 1, 0, (col * GameConstants.cellHeight) - 5);
-                drawnWalls.Add((row - 1) + "," + (col - 1) + ",2");
-            }
-            else if (col == 1)
-            {
-                rotationY = 0f; // Entrada izquierda
-                entryPosition = new Vector3((row * GameConstants.cellWidth) - 5, 0, (col -1) * GameConstants.cellHeight + GameConstants.wallThickness);
-                drawnWalls.Add((row - 1) + "," + (col - 1) + ",1");
-            }
-            else if (col == GameConstants.cols)
-            {
-                rotationY = -180f; // Entrada derecha
-                entryPosition = new Vector3((row * GameConstants.cellWidth) - 5, 0, col * GameConstants.cellHeight - 1 + GameConstants.wallThickness);
-                drawnWalls.Add((row - 1) + "," + (col - 1) + ",3");
-            }
-
-            CreateDoor(entryPosition, rotationY);
-        }
-    }
-
+    
     void CreateDoor(Vector3 position, float rotationY)
     {
         GameObject doorWall = Instantiate(doorWallPrefab, position, Quaternion.Euler(0, rotationY, 0));
@@ -484,5 +364,33 @@ public class WallAndDoorPlacement : MonoBehaviour
 
     void CreateCorner(Vector3 position, float rotationY) { // Crear esquina
         GameObject corner = Instantiate(wallCornerPrefab, position, Quaternion.Euler(0, rotationY, 0));
+    }
+
+    void CreatePOI(int file, int column)
+    {
+        float x = 7f + ((file - 1f) * (10f));
+        float y = 2f;
+        float z = 5f + ((column - 1f) * 10f);
+
+        Vector3 position = new Vector3(x, y, z);
+        GameObject poi = Instantiate(questionPrefab, position, Quaternion.Euler(poiRotation));
+        
+        poi.transform.SetParent(transform);
+        StartCoroutine(FloatPOI(poi.transform));
+    }
+
+    IEnumerator FloatPOI(Transform poiTransform)
+    {
+        Vector3 startPosition = poiTransform.position;
+        while (true)
+        {
+            // Calculate the new Y position using a sine wave
+            float newY = startPosition.y + Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
+
+            // Update the POI's position
+            poiTransform.position = new Vector3(poiTransform.position.x, newY, poiTransform.position.z);
+
+            yield return null;
+        }
     }
 }

@@ -2540,7 +2540,6 @@ GameObject:
   m_Component:
   - component: {fileID: 762034378}
   - component: {fileID: 762034380}
-  - component: {fileID: 762034381}
   - component: {fileID: 762034382}
   - component: {fileID: 762034383}
   m_Layer: 0
@@ -2577,26 +2576,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5f239c65c2b6674d93a441e255d6d13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  questionPrefab: {fileID: 2162839496276690756, guid: 8fab5e42e03ee4d40b4f0d9ae33d522e, type: 3}
+  poiRotation: {x: -90, y: 0, z: 90}
   wallPrefab: {fileID: 3110225186557736294, guid: 21a535d22987fe640a1027301c24527a, type: 3}
   wallWindowPrefab: {fileID: 2670981378253362000, guid: c97807e682897a741909f71ecc6ff3f4, type: 3}
   wallCornerPrefab: {fileID: 6546195225663131131, guid: c65fa09fdc546ef43a5add72ae6af690, type: 3}
   doorWallPrefab: {fileID: 218228737328147401, guid: 8a5005ab099bddd48a39009d0af238b2, type: 3}
   smokePrefab: {fileID: 6813416509558619124, guid: 3b7f2c753d435d647a80f1f047a113e3, type: 3}
   firePrefab: {fileID: 501295248943222296, guid: d6a5e2c4aefa6804b8f7d2af9a9676b5, type: 3}
---- !u!114 &762034381
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 762034377}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c15b69c73466c3641a3445654d906c8a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  questionPrefab: {fileID: 2162839496276690756, guid: 8fab5e42e03ee4d40b4f0d9ae33d522e, type: 3}
-  poiRotation: {x: -90, y: 0, z: 90}
 --- !u!114 &762034382
 MonoBehaviour:
   m_ObjectHideFlags: 0
