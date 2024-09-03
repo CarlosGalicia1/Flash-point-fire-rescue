@@ -2576,18 +2576,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5f239c65c2b6674d93a441e255d6d13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  redAgentPrefab: {fileID: 919132149155446097, guid: d22329ca5e22f8c47be0d8a9bd2943e2, type: 3}
-  blueAgentPrefab: {fileID: 919132149155446097, guid: eb9edd9ab0600dd44b355cc2761df4b6, type: 3}
-  greenAgentPrefab: {fileID: 919132149155446097, guid: c05e9a9de0558ea4e85b78161ef3eef4, type: 3}
-  yellowAgentPrefab: {fileID: 919132149155446097, guid: dcd160005562f23418c06e6b0fcd6d19, type: 3}
-  whiteAgentPrefab: {fileID: 919132149155446097, guid: 7c301622e0b1c1241a5143c4aa223160, type: 3}
-  purpleAgentPrefab: {fileID: 919132149155446097, guid: 67be2065f2aec3f4f9b7e13ed7365cd6, type: 3}
+  redAgentPrefab: {fileID: 7056914984670056887, guid: b698142ee83deba4d9dea6ed36e6c36c, type: 3}
+  blueAgentPrefab: {fileID: 4798873579671012642, guid: 0b4690da3bde3584bad437afa7243d31, type: 3}
+  greenAgentPrefab: {fileID: 3647886557965925980, guid: 4b318ce930f23c349ace36a47203802d, type: 3}
+  yellowAgentPrefab: {fileID: 2663098887833395897, guid: 0f5d0636efb16af489d1a05fd07d4ea1, type: 3}
+  whiteAgentPrefab: {fileID: 4279971704045372836, guid: 745520dd33d2ba84eb09035b924509a2, type: 3}
+  purpleAgentPrefab: {fileID: 6890641648439209122, guid: 70ec8db38bf7ce64887a276e8660b74f, type: 3}
   questionPrefab: {fileID: 2162839496276690756, guid: 8fab5e42e03ee4d40b4f0d9ae33d522e, type: 3}
   poiRotation: {x: -90, y: 0, z: 90}
   wallPrefab: {fileID: 3110225186557736294, guid: 21a535d22987fe640a1027301c24527a, type: 3}
   wallWindowPrefab: {fileID: 2670981378253362000, guid: c97807e682897a741909f71ecc6ff3f4, type: 3}
   wallCornerPrefab: {fileID: 6546195225663131131, guid: c65fa09fdc546ef43a5add72ae6af690, type: 3}
   doorWallPrefab: {fileID: 218228737328147401, guid: 8a5005ab099bddd48a39009d0af238b2, type: 3}
+  doorOpenedPrefab: {fileID: 3477072892241167151, guid: 94e38a3944c19fa458fc12a230b6f435, type: 3}
   smokePrefab: {fileID: 6813416509558619124, guid: 3b7f2c753d435d647a80f1f047a113e3, type: 3}
   firePrefab: {fileID: 501295248943222296, guid: d6a5e2c4aefa6804b8f7d2af9a9676b5, type: 3}
 --- !u!114 &762034382

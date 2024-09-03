@@ -26,94 +26,43 @@ public class Wall
         this.bottomHealth = bottomHealth;
         this.rightHealth = rightHealth;
     }
-    
-    public int getTop()
-    {
-        return this.top;
-    }
 
-    public int getLeft()
-    {
-        return this.left;
-    }
 
-    public int getBottom()
-    {
-        return this.bottom;
-    }
+    // Métodos 'get'
+    public int getTop() => this.top;
+    public int getLeft() => this.left;
+    public int getBottom() => this.bottom;
+    public int getRight() => this.right;
+    public bool getIsOpen() => this.isOpen;
+    public int getTopHealth() => this.topHealth;
+    public int getLeftHealth() => this.leftHealth;
+    public int getBottomHealth() => this.bottomHealth;
+    public int getRightHealth() => this.rightHealth;
 
-    public int getRight()
-    {
-        return this.right;
-    }
 
-    public bool getIsOpen()
-    {
-        return this.isOpen;
-    }
+    // Métodos 'set'
+    public void setTop(int top) => this.top = top;
+    public void setLeft(int left) => this.left = left;
+    public void setBottom(int bottom) => this.bottom = bottom;
+    public void setRight(int right) => this.right = right;
+    public void setIsOpen(bool isOpen) => this.isOpen = isOpen;
+    public void setTopHealth(int topHealth) => this.topHealth = topHealth;
+    public void setLeftHealth(int leftHealth) => this.leftHealth = leftHealth;
+    public void setBottomHealth(int bottomHealth) => this.bottomHealth = bottomHealth;
+    public void setRightHealth(int rightHealth) => this.rightHealth = rightHealth;
 
-    public int getTopHealth()
-    {
-        return this.topHealth;
-    }
 
-    public int getLeftHealth()
+    // Nuevo método para actualizar todas las propiedades de Wall
+    public void UpdateWall(int top, int left, int bottom, int right, bool isOpen, int topHealth, int leftHealth, int bottomHealth, int rightHealth)
     {
-        return this.leftHealth;
-    }
-
-    public int getBottomHealth()
-    {
-        return this.bottomHealth;
-    }
-
-    public int getRightHealth()
-    {
-        return this.rightHealth;
-    }
-
-    public void setTop(int top)
-    {
-        this.top = top;
-    }
-
-    public void setLeft(int left)
-    {
-        this.left = left;
-    }
-
-    public void setBottom(int bottom)
-    {
-        this.bottom = bottom;
-    }
-
-    public void setRight(int right)
-    {
-        this.right = right;
-    }
-
-    public void setIsOpen(bool isOpen)
-    {
-        this.isOpen = isOpen;
-    }
-
-    public void setTopHealth(int topHealth)
-    {
-        this.topHealth = topHealth;
-    }
-
-    public void setLeftHealth(int leftHealth)
-    {
-        this.leftHealth = leftHealth;
-    }
-
-    public void setBottomHealth(int bottomHealth)
-    {
-        this.bottomHealth = bottomHealth;
-    }
-
-    public void setRightHealth(int rightHealth)
-    {
-        this.rightHealth = rightHealth;
+        setTop(top);
+        setLeft(left);
+        setBottom(bottom);
+        setRight(right);
+        setIsOpen(isOpen);
+        setTopHealth(topHealth);
+        setLeftHealth(leftHealth);
+        setBottomHealth(bottomHealth);
+        setRightHealth(rightHealth);
     }
 }

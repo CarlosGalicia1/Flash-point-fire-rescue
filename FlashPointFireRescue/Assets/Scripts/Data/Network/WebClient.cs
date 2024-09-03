@@ -76,18 +76,54 @@ public class WebClient : MonoBehaviour
             {
                 string secondResponseData = www.downloadHandler.text;
                 Debug.Log("Second request response: " + secondResponseData);
+
+                // Inicia la corrutina para procesar los datos
+                StartCoroutine(ProcessResponseData(secondResponseData));
             }
         }
+    }
+
+    IEnumerator ProcessResponseData(string secondResponseData)
+    {
+        var responseDict = JsonConvert.DeserializeObject<Dictionary<string, List<BotRunData>>>(secondResponseData);
+
+
+        int runCounter = 0;
+        foreach (var run in responseDict.Values)
+        {
+            Debug.Log($"Current_run: {runCounter}");
+            runCounter++;
+            foreach (var botData in run)
+            {
+                Debug.Log($"Current firefighter id: {botData.bot_id}");
+                foreach (var stepData in botData.agent_step_data)
+                {
+                    Debug.Log($"Current agent step: {stepData.model_step_id}");
+                    var tileData = stepData.affected_tiles_data;
+                    UpdateTile(tileData);
+                    yield return new WaitForSeconds(0.5f);
+                }
+            }
+        }
+
+    }
+
+    void UpdateTile(AffectedTilesData tileData)
+    {
+        // Aquí actualizas las propiedades del Tile basado en tileData
+        Debug.Log($"Updating Tile at ({tileData.x}, {tileData.y}) with new data.");
+        WallAndDoorPlacement wallAndDoor = FindObjectOfType<WallAndDoorPlacement>();
+        wallAndDoor.UpdateTile(tileData);
+
+
     }
 
     // Start is called before the first frame update
     void Start()
     {
         Debug.Log("Sending first request...");
-        //string call = "What's up?";
         Vector3 fakePos = new Vector3(3.44f, 0, -15.707f);
         string json = EditorJsonUtility.ToJson(fakePos);
-        //StartCoroutine(SendData(call));
         StartCoroutine(SendData(json));
         Debug.Log("First request sent. Waiting to send second request...");
     }
@@ -95,6 +131,19 @@ public class WebClient : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+    }
+
+
+    public class BotRunData
+    {
+        public int bot_id { get; set; }
+        public List<AgentStepData> agent_step_data { get; set; }
+    }
+
+    public class AgentStepData
+    {
+        public int model_step_id { get; set; }
+        public AffectedTilesData affected_tiles_data { get; set; }
     }
 
     public class AffectedTilesData
@@ -119,86 +168,7 @@ public class WebClient : MonoBehaviour
         public int dy { get; set; }
     }
 
-    public class AgentStepData
-    {
-        public int model_step_id { get; set; }
-        public AffectedTilesData affected_tiles_data { get; set; }
-    }
 
-    public class Root
-    {
-        public List<Run0> run_0 { get; set; }
 
-        public List<Run1> run_1 { get; set; }
-
-        public List<Run2> run_2 { get; set; }
-
-        public List<Run3> run_3 { get; set; }
-
-        public List<Run4> run_4 { get; set; }
-
-        public List<Run5> run_5 { get; set; }
-        public List<Run5> run_6 { get; set; }
-        public List<Run5> run_7 { get; set; }
-        public List<Run5> run_8 { get; set; }
-        public List<Run5> run_9 { get; set; }
-    }
-
-    public class Run0
-    {
-    }
-
-    public class Run1
-    {
-        public int bot_id { get; set; }
-        public List<AgentStepData> agent_step_data { get; set; }
-    }
-
-    public class Run2
-    {
-        public int bot_id { get; set; }
-        public List<AgentStepData> agent_step_data { get; set; }
-    }
-
-    public class Run3
-    {
-        public int bot_id { get; set; }
-        public List<AgentStepData> agent_step_data { get; set; }
-    }
-
-    public class Run4
-    {
-        public int bot_id { get; set; }
-        public List<AgentStepData> agent_step_data { get; set; }
-    }
-
-    public class Run5
-    {
-        public int bot_id { get; set; }
-        public List<AgentStepData> agent_step_data { get; set; }
-    }
-
-    public class Run6
-    {
-        public int bot_id { get; set; }
-        public List<AgentStepData> agent_step_data { get; set; }
-    }
-
-    public class Run7
-    {
-        public int bot_id { get; set; }
-        public List<AgentStepData> agent_step_data { get; set; }
-    }
-
-    public class Run8
-    {
-        public int bot_id { get; set; }
-        public List<AgentStepData> agent_step_data { get; set; }
-    }
-
-    public class Run9
-    {
-        public int bot_id { get; set; }
-        public List<AgentStepData> agent_step_data { get; set; }
-    }
+    
 }
