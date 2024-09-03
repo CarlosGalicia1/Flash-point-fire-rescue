@@ -2576,6 +2576,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5f239c65c2b6674d93a441e255d6d13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  redAgentPrefab: {fileID: 919132149155446097, guid: d22329ca5e22f8c47be0d8a9bd2943e2, type: 3}
+  blueAgentPrefab: {fileID: 919132149155446097, guid: eb9edd9ab0600dd44b355cc2761df4b6, type: 3}
+  greenAgentPrefab: {fileID: 919132149155446097, guid: c05e9a9de0558ea4e85b78161ef3eef4, type: 3}
+  yellowAgentPrefab: {fileID: 919132149155446097, guid: dcd160005562f23418c06e6b0fcd6d19, type: 3}
+  whiteAgentPrefab: {fileID: 919132149155446097, guid: 7c301622e0b1c1241a5143c4aa223160, type: 3}
+  purpleAgentPrefab: {fileID: 919132149155446097, guid: 67be2065f2aec3f4f9b7e13ed7365cd6, type: 3}
   questionPrefab: {fileID: 2162839496276690756, guid: 8fab5e42e03ee4d40b4f0d9ae33d522e, type: 3}
   poiRotation: {x: -90, y: 0, z: 90}
   wallPrefab: {fileID: 3110225186557736294, guid: 21a535d22987fe640a1027301c24527a, type: 3}
