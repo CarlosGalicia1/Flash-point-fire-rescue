@@ -4918,7 +4918,7 @@ GameObject:
   - component: {fileID: 501295248945221848}
   m_Layer: 0
   m_Name: CampFire
-  m_TagString: Untagged
+  m_TagString: Smoke
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295

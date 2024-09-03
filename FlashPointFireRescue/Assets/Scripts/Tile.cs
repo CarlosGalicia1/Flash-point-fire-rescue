@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static WebClient;
 
 public class Tile
 {
@@ -22,49 +23,30 @@ public class Tile
         this.fireFighters = fireFighters;
     }
 
-    public Wall getWall()
+
+    // Métodos 'get'
+    public Wall getWall() => this.wall;
+    public int getFireStatus() => this.fireStatus;
+    public bool getHasPOI() => this.hasPOI;
+    public int getNumberVictims() => this.numberVictims;
+    public List<int> getFireFighters() => this.fireFighters;
+
+
+    // Métodos 'set'
+    public void setFireStatus(int fireStatus) => this.fireStatus = fireStatus;
+    public void setHasPOI(bool hasPOI) => this.hasPOI = hasPOI;
+    public void setNumberVictims(int numberVictims) => this.numberVictims = numberVictims;
+    public void setFireFighters(List<int> fireFighters) => this.fireFighters = fireFighters;
+
+
+    // Método para actualizar el Tile usando AffectedTilesData
+    public void UpdateTile(AffectedTilesData data)
     {
-        return this.wall;
-    }
-    
-    public int getFireStatus()
-    {
-        return this.fireStatus;
+        this.wall.UpdateWall(data.top, data.left, data.bottom, data.right, data.isOpen, data.topHealth, data.leftHealth, data.bottomHealth, data.rightHealth);
+        this.setFireStatus(data.fireStatus);
+        this.setHasPOI(data.hasPOI);
+        this.setNumberVictims(data.numberOfVictims);
+        this.setFireFighters(new List<int>(data.firefightersIDs));
     }
 
-    public bool getHasPOI()
-    {
-        return this.hasPOI;
-    }
-
-    public int getNumberVictims()
-    {
-        return this.numberVictims;
-    }
-
-    public List<int> getFireFighters()
-    {
-        return this.fireFighters;
-    }
-    
-    public void setFireStatus(int fireStatus)
-    {
-        this.fireStatus = fireStatus;
-    }
-
-    public void setHasPOI(bool hasPOI)
-    {
-        this.hasPOI = hasPOI;
-    }
-
-    public void setNumberVictims(int numberVictims)
-    {
-        this.numberVictims = numberVictims;
-    }
-
-    public void setFireFighters(List<int> fireFighters)
-    {
-        this.fireFighters = fireFighters;
-    }
-    
 }

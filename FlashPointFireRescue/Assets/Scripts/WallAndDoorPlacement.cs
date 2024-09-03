@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Vector3 = UnityEngine.Vector3;
 using Quaternion = UnityEngine.Quaternion;
+using static WebClient;
 
 public class WallAndDoorPlacement : MonoBehaviour
 {
@@ -28,212 +29,493 @@ public class WallAndDoorPlacement : MonoBehaviour
     private float floatSpeed = 1.5f;
     private float floatAmplitude = 1.8f;
 
+    private GameObject redAgentInstance;
+    private GameObject blueAgentInstance;
+    private GameObject greenAgentInstance;
+    private GameObject yellowAgentInstance;
+    private GameObject whiteAgentInstance;
+    private GameObject purpleAgentInstance;
+
     public void setDictionary(Dictionary<Vector2Int, Tile> tileDict)
     {
         this.tileDict = tileDict;
     }
     
+    public void UpdateEnvironment(KeyValuePair<Vector2Int, Tile> kvp)
+    {
+
+        Vector2Int tilePos = kvp.Key;
+        Tile tile = kvp.Value;
+        int positionX = tilePos.x - 1;
+        int positionY = tilePos.y - 1;
+        float rotationY = 0;
+        Vector3 doorPosition;
+        Vector3 cellPosition = new Vector3(positionX * GameConstants.cellWidth, 0, positionY * GameConstants.cellHeight);
+
+        bool outer = false;
+
+        Debug.Log("TilePos: " + tilePos);
+        Debug.Log("Tile firefighters: " + string.Join(", ", tile.getFireFighters()));
+
+        if (tile.getFireFighters().Count > 0)
+    {
+        foreach (int firefighter in tile.getFireFighters())
+        {
+            float x = ((positionX) * GameConstants.cellWidth) + (GameConstants.cellWidth / 2);
+            float z = ((positionY) * GameConstants.cellHeight) + (GameConstants.cellHeight / 2);
+            Vector3 position = new Vector3(x, 2f, z);
+
+            GameObject agent = null;
+            switch (firefighter)
+            {
+                case 0:
+                    // Destruir la instancia anterior del agente, no el prefab
+                    if (redAgentInstance != null)
+                    {
+                        Destroy(redAgentInstance);
+                    }
+                    // Instanciar un nuevo agente y almacenar la referencia
+                    redAgentInstance = Instantiate(redAgentPrefab, position, Quaternion.identity);
+                    break;
+
+                case 1:
+                    if (blueAgentInstance != null)
+                    {
+                        Destroy(blueAgentInstance);
+                    }
+                    blueAgentInstance = Instantiate(blueAgentPrefab, position, Quaternion.identity);
+                    break;
+
+                case 2:
+                    if (greenAgentInstance != null)
+                    {
+                        Destroy(greenAgentInstance);
+                    }
+                    greenAgentInstance = Instantiate(greenAgentPrefab, position, Quaternion.identity);
+                    break;
+
+                case 3:
+                    if (yellowAgentInstance != null)
+                    {
+                        Destroy(yellowAgentInstance);
+                    }
+                    yellowAgentInstance = Instantiate(yellowAgentPrefab, position, Quaternion.identity);
+                    break;
+
+                case 4:
+                    if (whiteAgentInstance != null)
+                    {
+                        Destroy(whiteAgentInstance);
+                    }
+                    whiteAgentInstance = Instantiate(whiteAgentPrefab, position, Quaternion.identity);
+                    break;
+
+                case 5:
+                    if (purpleAgentInstance != null)
+                    {
+                        Destroy(purpleAgentInstance);
+                    }
+                    purpleAgentInstance = Instantiate(purpleAgentPrefab, position, Quaternion.identity);
+                    break;
+            }
+        }
+    }
+
+        if (tile.getFireStatus() != 0)
+        {
+            float x = ((positionX) * GameConstants.cellWidth) + (GameConstants.cellWidth / 2);
+            float z = ((positionY) * GameConstants.cellHeight) + (GameConstants.cellHeight / 2);
+            if (tile.getFireStatus() == 1)
+            {
+                SpawnSmoke(x, z);
+            }
+            else if (tile.getFireStatus() == 2)
+            {
+                SpawnFire(x, z);
+            }
+        }
+
+        else if (tile.getFireStatus() == 0)
+        {
+            float x = ((positionX) * GameConstants.cellWidth) + (GameConstants.cellWidth / 2);
+            float z = ((positionY) * GameConstants.cellHeight) + (GameConstants.cellHeight / 2);
+            Vector3 smokePosition = new Vector3(x, 2f, z);
+            GameObject smokeObject = null;
+
+            GameObject[] smokeObjects = GameObject.FindGameObjectsWithTag("Smoke");
+            foreach (GameObject obj in smokeObjects)
+            {
+                if (obj.transform.position == smokePosition)
+                {
+                    smokeObject = obj;
+                    break;
+                }
+            }
+
+            if (smokeObject != null)
+            {
+                Destroy(smokeObject);
+            }
+        }
+
+        if (tile.getHasPOI())
+        {
+            CreatePOI(positionX + 1, positionY + 1);
+        }
+
+        else if (!tile.getHasPOI() && tile.getFireFighters().Count > 0)
+        {
+            Debug.Log("Poi revelado en la posicion: " + (positionX+1) + ", " + (positionY+1));
+            float x = 7f + ((positionX) * (10f));
+            float y = 1.8f;
+            float z = 5f + ((positionY) * 10f);
+
+            Vector3 position = new Vector3(x, y, z);
+            GameObject poi = null;
+
+            GameObject[] pois = GameObject.FindGameObjectsWithTag("POI");
+            foreach (GameObject obj in pois)
+            {
+                Debug.Log("Comparando POI en: " + obj.transform.position + " con: " + position);
+                if (Vector3.Distance(obj.transform.position, position) < 5f)
+                {   
+                    Debug.Log("POI encontrado en: " + (positionX + 1) + ", " + (positionY + 1));
+                    poi = obj;
+                    break;
+                }
+
+            }
+
+            if (poi != null)
+            {
+                Debug.Log("Eliminando POI en : " + (positionX + 1) + ", " + (positionY + 1));
+                Destroy(poi);
+            }
+        }
+
+        // Pared de abajo
+        if (tile.getWall().getTopHealth() == 0)
+        {
+            Vector3 wallPosition = cellPosition + new Vector3(0, 0, GameConstants.cellWidth / 2);
+            GameObject wallObject = GameObject.Find(wallPosition.ToString());
+            if (wallObject != null)
+            {
+                Destroy(wallObject);
+                Debug.LogWarning("Pared destruida en la posición: " + wallPosition);
+            }
+        }
+
+        else if (tile.getWall().getTopHealth() == 2)
+        {
+            Vector3 wallPosition = cellPosition + new Vector3(0, 0, GameConstants.cellWidth / 2);
+            GameObject wallObject = GameObject.Find(wallPosition.ToString());
+            if (wallObject != null)
+            {
+                Renderer wallRenderer = wallObject.GetComponent<Renderer>();
+                if (wallRenderer != null)
+                {
+                    wallRenderer.material = GameConstants.damagedMaterial;
+                    Debug.Log("Material de la pared cambiado a damagedMaterial.");
+                }
+                else
+                {
+                    Debug.LogWarning("El objeto no tiene un componente Renderer.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No se encontró ningún objeto en la posición esperada: " + wallPosition);
+            }
+        }
+
+        // Pared de abajo
+        if (tile.getWall().getBottomHealth() == 0)
+        {
+            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight, 0, GameConstants.cellWidth / 2);
+            GameObject wallObject = GameObject.Find(wallPosition.ToString());
+            if (wallObject != null)
+            {
+                Destroy(wallObject);
+                Debug.LogWarning("Pared destruida en la posición: " + wallPosition);
+            }
+        }
+
+        else if (tile.getWall().getBottomHealth() == 2)
+        {
+            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight, 0, GameConstants.cellWidth / 2);
+            GameObject wallObject = GameObject.Find(wallPosition.ToString());
+            if (wallObject != null)
+            {
+                Renderer wallRenderer = wallObject.GetComponent<Renderer>();
+                if (wallRenderer != null)
+                {
+                    wallRenderer.material = GameConstants.damagedMaterial;
+                    Debug.Log("Material de la pared cambiado a damagedMaterial.");
+                }
+                else
+                {
+                    Debug.LogWarning("El objeto no tiene un componente Renderer.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No se encontró ningún objeto en la posición esperada: " + wallPosition);
+            }
+        }
+
+        // Pared de la izquierda
+        if (tile.getWall().getLeftHealth() == 0)
+        {
+            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.wallThickness);
+            GameObject wallObject = GameObject.Find(wallPosition.ToString());
+            if (wallObject != null)
+            {
+                Destroy(wallObject);
+                Debug.LogWarning("Pared destruida en la posición: " + wallPosition);
+            }
+        }
+
+        else if (tile.getWall().getLeftHealth() == 2)
+        {
+            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.wallThickness);
+            GameObject wallObject = GameObject.Find(wallPosition.ToString());
+            if (wallObject != null)
+            {
+                Renderer wallRenderer = wallObject.GetComponent<Renderer>();
+                if (wallRenderer != null)
+                {
+                    wallRenderer.material = GameConstants.damagedMaterial;
+                    Debug.Log("Material de la pared cambiado a damagedMaterial.");
+                }
+                else
+                {
+                    Debug.LogWarning("El objeto no tiene un componente Renderer.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No se encontró ningún objeto en la posición esperada: " + wallPosition);
+            }
+        }
+
+        // Pared de la derecha
+        if (tile.getWall().getRightHealth() == 0)
+        {
+            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.cellWidth + GameConstants.wallThickness);
+            GameObject wallObject = GameObject.Find(wallPosition.ToString());
+            if (wallObject != null)
+            {
+                Destroy(wallObject);
+                Debug.LogWarning("Pared destruida en la posición: " + wallPosition);
+            }
+        }
+
+        else if (tile.getWall().getRightHealth() == 2)
+        {
+            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.cellWidth + GameConstants.wallThickness);
+            GameObject wallObject = GameObject.Find(wallPosition.ToString());
+            if (wallObject != null)
+            {
+                Renderer wallRenderer = wallObject.GetComponent<Renderer>();
+                if (wallRenderer != null)
+                {
+                    wallRenderer.material = GameConstants.damagedMaterial;
+                    Debug.Log("Material de la pared cambiado a damagedMaterial.");
+                }
+                else
+                {
+                    Debug.LogWarning("El objeto no tiene un componente Renderer.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No se encontró ningún objeto en la posición esperada: " + wallPosition);
+            }
+        }
+
+        // Verificar y agregar paredes arriba
+        if (!drawnWalls.Contains((positionX - 1) + "," + positionY + ",2") && !drawnWalls.Contains(positionX + "," + positionY + ",0"))
+        {
+            if (tile.getWall().getTop() == 1)
+            {
+                outer = (positionX == 0) ? true : false;
+                CreateWall(cellPosition + new Vector3(0, 0, GameConstants.cellWidth / 2), 90, outer);
+                drawnWalls.Add(positionX + "," + positionY + ",0");
+            }
+            else if (tile.getWall().getTop() == 2)
+            {
+                positionX = positionX + 1;
+                positionY = positionY + 1;
+                if (positionX == 1)
+                {
+                    rotationY = 90f;
+                    doorPosition = new Vector3((positionX - 1) * GameConstants.cellWidth, 0, (positionY * GameConstants.cellHeight) - 5);
+                    drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",0");
+                }
+                else
+                {
+                    rotationY = 90f;
+                    doorPosition = new Vector3(positionX * GameConstants.cellWidth, 0, (positionY * GameConstants.cellHeight) - 5);
+                    drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",2");
+                }
+                CreateDoor(doorPosition, rotationY);
+                positionX = positionX - 1;
+                positionY = positionY - 1;
+            }
+        }
+
+        // Verificar y agregar paredes izquierda
+        if (!drawnWalls.Contains(positionX + "," + (positionY - 1) + ",3") && !drawnWalls.Contains(positionX + "," + positionY + ",1"))
+        {
+            if (tile.getWall().getLeft() == 1)
+            {
+                outer = (positionY == 0) ? true : false;
+                CreateWall(cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.wallThickness), 0, outer);
+                drawnWalls.Add(positionX + "," + positionY + ",1");
+            }
+            else if (tile.getWall().getLeft() == 2)
+            {
+                positionX = positionX + 1;
+                positionY = positionY + 1;
+                rotationY = 0f;
+
+                if (positionY == 1)
+                {
+                    doorPosition = new Vector3((positionX * GameConstants.cellWidth) - 5, 0, (positionY - 1) * GameConstants.cellHeight + GameConstants.wallThickness);
+                    drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",1");
+                }
+                else
+                {
+                    doorPosition = new Vector3((positionX * GameConstants.cellWidth) - 5, 0, positionY * GameConstants.cellHeight + GameConstants.wallThickness);
+                    drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",3");
+                }
+
+                CreateDoor(doorPosition, rotationY);
+                positionX = positionX - 1;
+                positionY = positionY - 1;
+            }
+        }
+
+        // Verificar y agregar paredes abajo
+        if (!drawnWalls.Contains((positionX + 1) + "," + positionY + ",0") && !drawnWalls.Contains(positionX + "," + positionY + ",2"))
+        {
+            if (tile.getWall().getBottom() == 1)
+            {
+                outer = (positionX == GameConstants.rows - 1) ? true : false;
+                CreateWall(cellPosition + new Vector3(GameConstants.cellHeight, 0, GameConstants.cellWidth / 2), 90, outer);
+                drawnWalls.Add(positionX + "," + positionY + ",2");
+            }
+            else if (tile.getWall().getBottom() == 2)
+            {
+                positionX = positionX + 1;
+                positionY = positionY + 1;
+
+                if (positionX == GameConstants.rows)
+                {
+                    rotationY = -90f;
+                    doorPosition = new Vector3((positionX * GameConstants.cellWidth) - 1, 0, (positionY * GameConstants.cellHeight) - 5);
+                    drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",2");
+                }
+                else
+                {
+                    rotationY = 90f;
+                    doorPosition = new Vector3((positionX * GameConstants.cellWidth), 0, (positionY * GameConstants.cellHeight) - 5);
+                    drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",2");
+                }
+                CreateDoor(doorPosition, rotationY);
+                positionX = positionX - 1;
+                positionY = positionY - 1;
+            }
+        }
+
+        // Verificar y agregar paredes derecha
+        if (!drawnWalls.Contains(positionX + "," + (positionY + 1) + ",1") && !drawnWalls.Contains(positionX + "," + positionY + ",3"))
+        {
+            if (tile.getWall().getRight() == 1)
+            {
+                outer = (positionY == GameConstants.cols - 1) ? true : false;
+                CreateWall(cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.cellWidth + GameConstants.wallThickness), 0, outer);
+                drawnWalls.Add(positionX + "," + positionY + ",3");
+            }
+            else if (tile.getWall().getRight() == 2)
+            {
+                positionX = positionX + 1;
+                positionY = positionY + 1;
+
+                if (positionY == GameConstants.cols)
+                {
+                    rotationY = -180f;
+                    doorPosition = new Vector3((positionX * GameConstants.cellWidth) - 5, 0, positionY * GameConstants.cellHeight - 1 + GameConstants.wallThickness);
+                    drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",3");
+                }
+                else
+                {
+                    rotationY = 0f;
+                    doorPosition = new Vector3((positionX * GameConstants.cellWidth) - 5, 0, positionY * GameConstants.cellHeight + GameConstants.wallThickness);
+                    drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",3");
+                }
+                CreateDoor(doorPosition, rotationY);
+                positionX = positionX - 1;
+                positionY = positionY - 1;
+            }
+        }
+
+        CheckCorners(tile, cellPosition);
+    }
+
     public void PlaceWalls()
     {
         foreach (KeyValuePair<Vector2Int, Tile> kvp in tileDict)
         {
-            Vector2Int tilePos = kvp.Key;
-            Tile tile = kvp.Value;
-            int positionX = tilePos.x - 1;
-            int positionY = tilePos.y - 1;
-            float rotationY = 0;
-            Vector3 doorPosition;
-            Vector3 cellPosition = new Vector3(positionX * GameConstants.cellWidth, 0, positionY * GameConstants.cellHeight);
-
-            bool outer = false;
-
-            Debug.Log("TilePos: " + tilePos);
-            Debug.Log("Tile firefighters: " + string.Join(", ", tile.getFireFighters())); 
-
-            if (tile.getFireFighters().Count > 0)
-            {
-                foreach (int firefighter in tile.getFireFighters())
-                {
-                    
-                    Debug.Log("Firefighter: " + firefighter + "placed at: " + positionX + ", " + positionY);
-                    float x = ((positionX) * GameConstants.cellWidth) + (GameConstants.cellWidth / 2);
-                    float z = ((positionY) * GameConstants.cellHeight) + (GameConstants.cellHeight / 2);
-                    
-                    Vector3 position = new Vector3(x, 2f, z);
-                    GameObject agent = null;
-                    switch (firefighter)
-                    {
-                        case 0:
-                            agent = Instantiate(redAgentPrefab, position, Quaternion.identity);
-                            break;
-                        case 1:
-                            agent = Instantiate(blueAgentPrefab, position, Quaternion.identity);
-                            break;
-                        case 2:
-                            agent = Instantiate(greenAgentPrefab, position, Quaternion.identity);
-                            break;
-                        case 3:
-                            agent = Instantiate(yellowAgentPrefab, position, Quaternion.identity);
-                            break;
-                        case 4:
-                            agent = Instantiate(whiteAgentPrefab, position, Quaternion.identity);
-                            break;
-                        case 5:
-                            agent = Instantiate(purpleAgentPrefab, position, Quaternion.identity);
-                            break;
-                    }
-                }
-            }
-
-            if (tile.getFireStatus() != 0)
-            {
-                float x = ((positionX) * GameConstants.cellWidth) + (GameConstants.cellWidth / 2);
-                float z = ((positionY) * GameConstants.cellHeight) + (GameConstants.cellHeight / 2);
-                if (tile.getFireStatus() == 1)
-                {
-                    SpawnSmoke(x, z);
-                }
-                else if (tile.getFireStatus() == 2)
-                {
-                    SpawnFire(x, z);
-                }
-            }
-
-            if (tile.getHasPOI())
-            {
-                CreatePOI(positionX + 1, positionY + 1);
-            }
-
-            // Verificar y agregar paredes arriba
-            if (!drawnWalls.Contains((positionX - 1) + "," + positionY + ",2") && !drawnWalls.Contains(positionX + "," + positionY + ",0"))
-            {
-                if (tile.getWall().getTop() == 1)
-                {
-                    outer  = (positionX == 0) ? true : false;
-                    CreateWall(cellPosition + new Vector3(0, 0, GameConstants.cellWidth/2), 90,outer);
-                    drawnWalls.Add(positionX + "," + positionY + ",0");
-                }
-                else if (tile.getWall().getTop() == 2)
-                {
-                    positionX = positionX + 1;
-                    positionY = positionY + 1;
-                    if (positionX == 1)
-                    {
-                        rotationY = 90f;
-                        doorPosition = new Vector3((positionX - 1) * GameConstants.cellWidth, 0, (positionY * GameConstants.cellHeight) - 5);
-                        drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",0");
-                    }
-                    else
-                    {
-                        rotationY = 90f;
-                        doorPosition = new Vector3(positionX * GameConstants.cellWidth, 0, (positionY * GameConstants.cellHeight) - 5);
-                        drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",2");
-                    }
-                    CreateDoor(doorPosition, rotationY);
-                    positionX = positionX - 1;
-                    positionY = positionY - 1;
-                }
-            }
-
-            // Verificar y agregar paredes izquierda
-            if (!drawnWalls.Contains(positionX + "," + (positionY - 1) + ",3") && !drawnWalls.Contains(positionX + "," + positionY + ",1"))
-            {
-                if (tile.getWall().getLeft() == 1)
-                {
-                    outer = (positionY == 0) ? true : false;
-                    CreateWall(cellPosition + new Vector3(GameConstants.cellHeight/2, 0, GameConstants.wallThickness), 0, outer);
-                    drawnWalls.Add(positionX + "," + positionY + ",1");
-                }
-                else if (tile.getWall().getLeft() == 2)
-                {
-                    positionX = positionX + 1;
-                    positionY = positionY + 1;
-                    rotationY = 0f;
-
-                    if (positionY == 1)
-                    {
-                        doorPosition = new Vector3((positionX * GameConstants.cellWidth) - 5, 0, (positionY - 1) * GameConstants.cellHeight + GameConstants.wallThickness);
-                        drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",1");
-                    }
-                    else
-                    {
-                        doorPosition = new Vector3((positionX * GameConstants.cellWidth) - 5, 0, positionY * GameConstants.cellHeight + GameConstants.wallThickness);
-                        drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",3");
-                    }
-                    
-                    CreateDoor(doorPosition, rotationY);
-                    positionX = positionX - 1;
-                    positionY = positionY - 1;
-                }
-            }
-
-            // Verificar y agregar paredes abajo
-            if (!drawnWalls.Contains((positionX + 1) + "," + positionY + ",0") && !drawnWalls.Contains(positionX + "," + positionY + ",2"))
-            {
-                if (tile.getWall().getBottom() == 1)
-                {
-                    outer = (positionX == GameConstants.rows - 1) ? true : false;
-                    CreateWall(cellPosition + new Vector3(GameConstants.cellHeight, 0, GameConstants.cellWidth/2), 90, outer);
-                    drawnWalls.Add(positionX + "," + positionY + ",2");
-                }
-                else if (tile.getWall().getBottom() == 2)
-                {
-                    positionX = positionX + 1;
-                    positionY = positionY + 1;
-
-                    if (positionX == GameConstants.rows)
-                    {
-                        rotationY = -90f;
-                        doorPosition = new Vector3((positionX * GameConstants.cellWidth) - 1, 0, (positionY * GameConstants.cellHeight) - 5);
-                        drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",2");
-                    }
-                    else
-                    {
-                        rotationY = 90f;
-                        doorPosition = new Vector3((positionX * GameConstants.cellWidth), 0, (positionY * GameConstants.cellHeight) - 5);
-                        drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",2");
-                    }
-                    CreateDoor(doorPosition, rotationY);
-                    positionX = positionX - 1;
-                    positionY = positionY - 1;
-                }   
-            }
-
-            // Verificar y agregar paredes derecha
-            if (!drawnWalls.Contains(positionX + "," + (positionY + 1) + ",1") && !drawnWalls.Contains(positionX + "," + positionY + ",3"))
-            {
-                if (tile.getWall().getRight() == 1)
-                {
-                    outer = (positionY == GameConstants.cols - 1) ? true : false;
-                    CreateWall(cellPosition + new Vector3(GameConstants.cellHeight/2, 0, GameConstants.cellWidth + GameConstants.wallThickness), 0, outer);
-                    drawnWalls.Add(positionX + "," + positionY + ",3");
-                }
-                else if (tile.getWall().getRight() == 2)
-                {
-                    positionX = positionX + 1;
-                    positionY = positionY + 1;
-                    
-                    if (positionY == GameConstants.cols)
-                    {
-                        rotationY = -180f;
-                        doorPosition = new Vector3((positionX * GameConstants.cellWidth) - 5, 0, positionY * GameConstants.cellHeight - 1 + GameConstants.wallThickness);
-                        drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",3");
-                    }
-                    else
-                    {
-                        rotationY = 0f;
-                        doorPosition = new Vector3((positionX * GameConstants.cellWidth) - 5, 0, positionY * GameConstants.cellHeight + GameConstants.wallThickness);
-                        drawnWalls.Add((positionX - 1) + "," + (positionY - 1) + ",3");
-                    }
-                    CreateDoor(doorPosition, rotationY);
-                    positionX = positionX - 1;
-                    positionY = positionY - 1;
-                }
-            }
-            
-            CheckCorners(tile, cellPosition);
+            UpdateEnvironment(kvp);
         }
     }
+
+
+    // Nuevo método para actualizar individualmente cada Tile
+    public void UpdateTile(AffectedTilesData tileData)
+    {
+        // Buscamos el Tile correspondiente según las coordenadas
+        //vTile tileToUpdate = FindTile(tileData.x, tileData.y);
+        Vector2Int position = new Vector2Int(tileData.x, tileData.y);
+        Tile tileToUpdate = tileDict[position];
+
+        if (tileToUpdate != null)
+        {
+            // Actualizamos el Tile con los nuevos datos
+            tileToUpdate.UpdateTile(tileData);
+            tileDict[position] = tileToUpdate;
+            UpdateEnvironment(new KeyValuePair<Vector2Int, Tile>(position, tileToUpdate));
+
+            Debug.Log($"Tile at ({tileData.x}, {tileData.y}) updated successfully.");
+        }
+        else
+        {
+            Debug.LogWarning($"Tile at ({tileData.x}, {tileData.y}) not found.");
+        }
+        
+    }
+
+    // Método para encontrar un Tile en la lista basada en sus coordenadas
+    private Tile FindTile(int x, int y)
+    {
+        Vector2Int position = new Vector2Int(x, y);
+        if (tileDict.TryGetValue(position, out Tile tile))
+        {
+            return tile;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void UpdateDictionary(Tile tile, Vector2Int position)
+    {
+        // Update the tile of the dictionary
+        tileDict[position] = tile;
+    }
+
 
     void CheckCorners(Tile tile, Vector3 cellPosition)
     {
@@ -345,11 +627,13 @@ public class WallAndDoorPlacement : MonoBehaviour
         {
             // Calculate the new Y position using a sine wave
             float newY = startPosition.y + Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
-
-            // Update the POI's position
-            poiTransform.position = new Vector3(poiTransform.position.x, newY, poiTransform.position.z);
-
-            yield return null;
+            while (poiTransform != null)
+            {
+                // Update the POI's position
+                poiTransform.position = new Vector3(poiTransform.position.x, newY, poiTransform.position.z);
+                yield return null;
+            }
+            yield break;
         }
     }
 }
