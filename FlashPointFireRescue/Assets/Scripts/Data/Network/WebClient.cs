@@ -1,18 +1,12 @@
-﻿// TC2008B Modelación de Sistemas Multiagentes con gráficas computacionales
-// C# client to interact with Python server via POST
-// Sergio Ruiz-Loza, Ph.D. March 2021
-
-using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
+using UnityEditor;
 
 public class WebClient : MonoBehaviour
 {
-    // IEnumerator - yield return
     IEnumerator SendData(string data)
     {
         WWWForm form = new WWWForm();
@@ -23,7 +17,6 @@ public class WebClient : MonoBehaviour
             byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(data);
             www.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
             www.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
-            //www.SetRequestHeader("Content-Type", "text/html");
             www.SetRequestHeader("Content-Type", "application/json");
 
             yield return www.SendWebRequest();          // Talk to Python
@@ -34,9 +27,10 @@ public class WebClient : MonoBehaviour
             else
             {
                 string jsonResponse = www.downloadHandler.text;
+                Debug.Log("Response: " + jsonResponse);
+
                 Dictionary<string, Tile> dictString = JsonConvert.DeserializeObject<Dictionary<string, Tile>>(jsonResponse);
                 Dictionary<Vector2Int, Tile> houseFire = new Dictionary<Vector2Int, Tile>();
-
                 foreach (KeyValuePair<string, Tile> entry in dictString)
                 {
                     string[] key = entry.Key.Split(',');
@@ -57,65 +51,154 @@ public class WebClient : MonoBehaviour
                 wallAndDoor.PlaceWalls();
 
                 Debug.Log("Form upload complete!");
-                // wallAndDoor.ReceiveData(result);
-                //Vector3 tPos = JsonUtility.FromJson<Vector3>(www.downloadHandler.text.Replace('\'', '\"'));
 
-
-                /*
-                string jsonResponse = www.downloadHandler.text;
-
-                Debug.Log("JsonResponse" + jsonResponse); 
-
-                // Dividir el string por la palabra "data"
-                string[] initial = jsonResponse.Substring(1, jsonResponse.Length - 2).Split(new string[] { "type" }, StringSplitOptions.None);
-
-                // Mostrar las partes divididas
-                foreach (string part in initial)
-                {
-                    Debug.Log(part);
-                }
-
-                FixString(initial[1]);
-                
-                Debug.Log(www.downloadHandler.text);    // Answer from Python
-                string tPos = www.downloadHandler.text;
-                
-                WallAndDoorPlacement wallAndDoor = FindObjectOfType<WallAndDoorPlacement>();
-                wallAndDoor.ReceiveData(tPos);
-                //Vector3 tPos = JsonUtility.FromJson<Vector3>(www.downloadHandler.text.Replace('\'', '\"'));
-                Debug.Log("Form upload complete!");
-                */
+                StartCoroutine(SendSecondRequest());
             }
         }
-
     }
 
+    IEnumerator SendSecondRequest()
+    {
+        string url = "http://localhost:8585";
+
+        using (UnityWebRequest www = UnityWebRequest.PostWwwForm(url, ""))
+        {
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                string secondResponseData = www.downloadHandler.text;
+                Debug.Log("Second request response: " + secondResponseData);
+            }
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("Sending first request...");
         //string call = "What's up?";
         Vector3 fakePos = new Vector3(3.44f, 0, -15.707f);
         string json = EditorJsonUtility.ToJson(fakePos);
         //StartCoroutine(SendData(call));
         StartCoroutine(SendData(json));
-        // transform.localPosition
+        Debug.Log("First request sent. Waiting to send second request...");
     }
 
     // Update is called once per frame
     void Update()
     {
-        
     }
 
-    void FixString(string str)
+    public class AffectedTilesData
     {
-        int startIndex = str.IndexOf('{');
-        int endIndex = str.LastIndexOf('}');
+        public int x { get; set; }
+        public int y { get; set; }
+        public int top { get; set; }
+        public int left { get; set; }
+        public int bottom { get; set; }
+        public int right { get; set; }
+        public bool isOpen { get; set; }
+        public int topHealth { get; set; }
+        public int leftHealth { get; set; }
+        public int bottomHealth { get; set; }
+        public int rightHealth { get; set; }
+        public int fireStatus { get; set; }
+        public bool hasPOI { get; set; }
+        public int numberOfVictims { get; set; }
+        public List<int> firefightersIDs { get; set; }
+        public string actions { get; set; }
+        public int dx { get; set; }
+        public int dy { get; set; }
+    }
 
-        // Obtiene el substring desde el primer '{' hasta el último '}'
-        string result = str.Substring(startIndex, endIndex - startIndex + 1);
-        WallAndDoorPlacement wallAndDoor = FindObjectOfType<WallAndDoorPlacement>();
-        wallAndDoor.ReceiveData(result);
+    public class AgentStepData
+    {
+        public int model_step_id { get; set; }
+        public AffectedTilesData affected_tiles_data { get; set; }
+    }
+
+    public class Root
+    {
+        public List<Run0> run_0 { get; set; }
+
+        public List<Run1> run_1 { get; set; }
+
+        public List<Run2> run_2 { get; set; }
+
+        public List<Run3> run_3 { get; set; }
+
+        public List<Run4> run_4 { get; set; }
+
+        public List<Run5> run_5 { get; set; }
+        public List<Run5> run_6 { get; set; }
+        public List<Run5> run_7 { get; set; }
+        public List<Run5> run_8 { get; set; }
+        public List<Run5> run_9 { get; set; }
+    }
+
+    public class Run0
+    {
+    }
+
+    public class Run1
+    {
+        public int bot_id { get; set; }
+        public List<AgentStepData> agent_step_data { get; set; }
+    }
+
+    public class Run2
+    {
+        public int bot_id { get; set; }
+        public List<AgentStepData> agent_step_data { get; set; }
+    }
+
+    public class Run3
+    {
+        public int bot_id { get; set; }
+        public List<AgentStepData> agent_step_data { get; set; }
+    }
+
+    public class Run4
+    {
+        public int bot_id { get; set; }
+        public List<AgentStepData> agent_step_data { get; set; }
+    }
+
+    public class Run5
+    {
+        public int bot_id { get; set; }
+        public List<AgentStepData> agent_step_data { get; set; }
+    }
+
+    public class Run6
+    {
+        public int bot_id { get; set; }
+        public List<AgentStepData> agent_step_data { get; set; }
+    }
+
+    public class Run7
+    {
+        public int bot_id { get; set; }
+        public List<AgentStepData> agent_step_data { get; set; }
+    }
+
+    public class Run8
+    {
+        public int bot_id { get; set; }
+        public List<AgentStepData> agent_step_data { get; set; }
+    }
+
+    public class Run9
+    {
+        public int bot_id { get; set; }
+        public List<AgentStepData> agent_step_data { get; set; }
     }
 }
