@@ -22,6 +22,7 @@ public class WallAndDoorPlacement : MonoBehaviour
     public GameObject wallWindowPrefab; // Prefab de la pared con ventana
     public GameObject wallCornerPrefab; // Prefab de la esquina de la pared
     public GameObject doorWallPrefab; // Prefab de la puerta 
+    public GameObject doorOpenedPrefab;
     public GameObject smokePrefab;      // Prefab del humo
     public GameObject firePrefab;       // Prefab del fuego
     private Dictionary<Vector2Int, Tile> tileDict; // Matriz de las paredes y puertas
@@ -35,6 +36,10 @@ public class WallAndDoorPlacement : MonoBehaviour
     private GameObject yellowAgentInstance;
     private GameObject whiteAgentInstance;
     private GameObject purpleAgentInstance;
+
+    private Dictionary<Vector3, GameObject> wallDict = new Dictionary<Vector3, GameObject>();
+    private Dictionary<Vector3, GameObject> doorDict = new Dictionary<Vector3, GameObject>();
+    private List<GameObject> destroyList = new List<GameObject> ();
 
     public void setDictionary(Dictionary<Vector2Int, Tile> tileDict)
     {
@@ -52,74 +57,127 @@ public class WallAndDoorPlacement : MonoBehaviour
         Vector3 doorPosition;
         Vector3 cellPosition = new Vector3(positionX * GameConstants.cellWidth, 0, positionY * GameConstants.cellHeight);
 
+        // Verifica si la pared superior debe ser destruida o cambiar de material
+        Vector3 topWallPosition = cellPosition + new Vector3(0, 0, GameConstants.cellWidth / 2);
+        HandleWall(tile.getWall().getTopHealth(), topWallPosition);
+
+        // Verifica si la pared inferior debe ser destruida o cambiar de material
+        Vector3 bottomWallPosition = cellPosition + new Vector3(GameConstants.cellHeight, 0, GameConstants.cellWidth / 2);
+        HandleWall(tile.getWall().getBottomHealth(), bottomWallPosition);
+
+        // Verifica si la pared izquierda debe ser destruida o cambiar de material
+        Vector3 leftWallPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.wallThickness);
+        HandleWall(tile.getWall().getLeftHealth(), leftWallPosition);
+
+        // Verifica si la pared derecha debe ser destruida o cambiar de material
+        Vector3 rightWallPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.cellWidth + GameConstants.wallThickness);
+        HandleWall(tile.getWall().getRightHealth(), rightWallPosition);
+
+        // Verificar y manejar la puerta superior
+        Vector3 topDoorPosition = cellPosition + new Vector3(0, 0, GameConstants.cellWidth / 2);
+        HandleDoor(tile.getWall().getTopHealth(), topDoorPosition);
+    
+        // Verificar y manejar la puerta inferior
+        Vector3 bottomDoorPosition = cellPosition + new Vector3(GameConstants.cellHeight, 0, GameConstants.cellWidth / 2);
+        HandleDoor(tile.getWall().getBottomHealth(), bottomDoorPosition);
+    
+        // Verificar y manejar la puerta izquierda
+        Vector3 leftDoorPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.wallThickness);
+        HandleDoor(tile.getWall().getLeftHealth(), leftDoorPosition);
+    
+        // Verificar y manejar la puerta derecha
+        Vector3 rightDoorPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.cellWidth + GameConstants.wallThickness);
+        HandleDoor(tile.getWall().getRightHealth(), rightDoorPosition);
+        
+        // Reemplazar puerta cerrada por abierta si es necesario
+        if (tile.getWall().getTop() == 2 && tile.getWall().getIsOpen())
+        {
+            ReplaceWithOpenedDoor(topDoorPosition, 90f);
+        }
+
+        if (tile.getWall().getBottom() == 2 && tile.getWall().getIsOpen())
+        {
+            ReplaceWithOpenedDoor(bottomDoorPosition, -90f);
+        }
+
+        if (tile.getWall().getLeft() == 2 && tile.getWall().getIsOpen())
+        {
+            ReplaceWithOpenedDoor(leftDoorPosition, 0f);
+        }
+
+        if (tile.getWall().getRight() == 2 && tile.getWall().getIsOpen())
+        {
+            ReplaceWithOpenedDoor(rightDoorPosition, 0f);
+        }
+        
         bool outer = false;
 
         Debug.Log("TilePos: " + tilePos);
         Debug.Log("Tile firefighters: " + string.Join(", ", tile.getFireFighters()));
 
         if (tile.getFireFighters().Count > 0)
-    {
-        foreach (int firefighter in tile.getFireFighters())
         {
-            float x = ((positionX) * GameConstants.cellWidth) + (GameConstants.cellWidth / 2);
-            float z = ((positionY) * GameConstants.cellHeight) + (GameConstants.cellHeight / 2);
-            Vector3 position = new Vector3(x, 2f, z);
-
-            GameObject agent = null;
-            switch (firefighter)
+            foreach (int firefighter in tile.getFireFighters())
             {
-                case 0:
-                    // Destruir la instancia anterior del agente, no el prefab
-                    if (redAgentInstance != null)
-                    {
-                        Destroy(redAgentInstance);
-                    }
-                    // Instanciar un nuevo agente y almacenar la referencia
-                    redAgentInstance = Instantiate(redAgentPrefab, position, Quaternion.identity);
-                    break;
+                float x = ((positionX) * GameConstants.cellWidth) + (GameConstants.cellWidth / 2);
+                float z = ((positionY) * GameConstants.cellHeight) + (GameConstants.cellHeight / 2);
+                Vector3 position = new Vector3(x, 2f, z);
 
-                case 1:
-                    if (blueAgentInstance != null)
-                    {
-                        Destroy(blueAgentInstance);
-                    }
-                    blueAgentInstance = Instantiate(blueAgentPrefab, position, Quaternion.identity);
-                    break;
+                GameObject agent = null;
+                switch (firefighter)
+                {
+                    case 0:
+                        // Destruir la instancia anterior del agente, no el prefab
+                        if (redAgentInstance != null)
+                        {
+                            Destroy(redAgentInstance);
+                        }
+                        // Instanciar un nuevo agente y almacenar la referencia
+                        redAgentInstance = Instantiate(redAgentPrefab, position, Quaternion.identity);
+                        break;
 
-                case 2:
-                    if (greenAgentInstance != null)
-                    {
-                        Destroy(greenAgentInstance);
-                    }
-                    greenAgentInstance = Instantiate(greenAgentPrefab, position, Quaternion.identity);
-                    break;
+                    case 1:
+                        if (blueAgentInstance != null)
+                        {
+                            Destroy(blueAgentInstance);
+                        }
+                        blueAgentInstance = Instantiate(blueAgentPrefab, position, Quaternion.identity);
+                        break;
 
-                case 3:
-                    if (yellowAgentInstance != null)
-                    {
-                        Destroy(yellowAgentInstance);
-                    }
-                    yellowAgentInstance = Instantiate(yellowAgentPrefab, position, Quaternion.identity);
-                    break;
+                    case 2:
+                        if (greenAgentInstance != null)
+                        {
+                            Destroy(greenAgentInstance);
+                        }
+                        greenAgentInstance = Instantiate(greenAgentPrefab, position, Quaternion.identity);
+                        break;
 
-                case 4:
-                    if (whiteAgentInstance != null)
-                    {
-                        Destroy(whiteAgentInstance);
-                    }
-                    whiteAgentInstance = Instantiate(whiteAgentPrefab, position, Quaternion.identity);
-                    break;
+                    case 3:
+                        if (yellowAgentInstance != null)
+                        {
+                            Destroy(yellowAgentInstance);
+                        }
+                        yellowAgentInstance = Instantiate(yellowAgentPrefab, position, Quaternion.identity);
+                        break;
 
-                case 5:
-                    if (purpleAgentInstance != null)
-                    {
-                        Destroy(purpleAgentInstance);
-                    }
-                    purpleAgentInstance = Instantiate(purpleAgentPrefab, position, Quaternion.identity);
-                    break;
+                    case 4:
+                        if (whiteAgentInstance != null)
+                        {
+                            Destroy(whiteAgentInstance);
+                        }
+                        whiteAgentInstance = Instantiate(whiteAgentPrefab, position, Quaternion.identity);
+                        break;
+
+                    case 5:
+                        if (purpleAgentInstance != null)
+                        {
+                            Destroy(purpleAgentInstance);
+                        }
+                        purpleAgentInstance = Instantiate(purpleAgentPrefab, position, Quaternion.identity);
+                        break;
+                }
             }
         }
-    }
 
         if (tile.getFireStatus() != 0)
         {
@@ -177,163 +235,19 @@ public class WallAndDoorPlacement : MonoBehaviour
             foreach (GameObject obj in pois)
             {
                 Debug.Log("Comparando POI en: " + obj.transform.position + " con: " + position);
-                if (Vector3.Distance(obj.transform.position, position) < 5f)
+                Debug.Log("Distancia: " + Vector3.Distance(obj.transform.position, position));
+                if (Vector3.Distance(obj.transform.position, position) < 3f)
                 {   
                     Debug.Log("POI encontrado en: " + (positionX + 1) + ", " + (positionY + 1));
-                    poi = obj;
-                    break;
+                    destroyList.Add(obj);
+
+
                 }
 
             }
-
-            if (poi != null)
-            {
-                Debug.Log("Eliminando POI en : " + (positionX + 1) + ", " + (positionY + 1));
-                Destroy(poi);
-            }
         }
 
-        // Pared de abajo
-        if (tile.getWall().getTopHealth() == 0)
-        {
-            Vector3 wallPosition = cellPosition + new Vector3(0, 0, GameConstants.cellWidth / 2);
-            GameObject wallObject = GameObject.Find(wallPosition.ToString());
-            if (wallObject != null)
-            {
-                Destroy(wallObject);
-                Debug.LogWarning("Pared destruida en la posición: " + wallPosition);
-            }
-        }
-
-        else if (tile.getWall().getTopHealth() == 2)
-        {
-            Vector3 wallPosition = cellPosition + new Vector3(0, 0, GameConstants.cellWidth / 2);
-            GameObject wallObject = GameObject.Find(wallPosition.ToString());
-            if (wallObject != null)
-            {
-                Renderer wallRenderer = wallObject.GetComponent<Renderer>();
-                if (wallRenderer != null)
-                {
-                    wallRenderer.material = GameConstants.damagedMaterial;
-                    Debug.Log("Material de la pared cambiado a damagedMaterial.");
-                }
-                else
-                {
-                    Debug.LogWarning("El objeto no tiene un componente Renderer.");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("No se encontró ningún objeto en la posición esperada: " + wallPosition);
-            }
-        }
-
-        // Pared de abajo
-        if (tile.getWall().getBottomHealth() == 0)
-        {
-            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight, 0, GameConstants.cellWidth / 2);
-            GameObject wallObject = GameObject.Find(wallPosition.ToString());
-            if (wallObject != null)
-            {
-                Destroy(wallObject);
-                Debug.LogWarning("Pared destruida en la posición: " + wallPosition);
-            }
-        }
-
-        else if (tile.getWall().getBottomHealth() == 2)
-        {
-            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight, 0, GameConstants.cellWidth / 2);
-            GameObject wallObject = GameObject.Find(wallPosition.ToString());
-            if (wallObject != null)
-            {
-                Renderer wallRenderer = wallObject.GetComponent<Renderer>();
-                if (wallRenderer != null)
-                {
-                    wallRenderer.material = GameConstants.damagedMaterial;
-                    Debug.Log("Material de la pared cambiado a damagedMaterial.");
-                }
-                else
-                {
-                    Debug.LogWarning("El objeto no tiene un componente Renderer.");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("No se encontró ningún objeto en la posición esperada: " + wallPosition);
-            }
-        }
-
-        // Pared de la izquierda
-        if (tile.getWall().getLeftHealth() == 0)
-        {
-            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.wallThickness);
-            GameObject wallObject = GameObject.Find(wallPosition.ToString());
-            if (wallObject != null)
-            {
-                Destroy(wallObject);
-                Debug.LogWarning("Pared destruida en la posición: " + wallPosition);
-            }
-        }
-
-        else if (tile.getWall().getLeftHealth() == 2)
-        {
-            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.wallThickness);
-            GameObject wallObject = GameObject.Find(wallPosition.ToString());
-            if (wallObject != null)
-            {
-                Renderer wallRenderer = wallObject.GetComponent<Renderer>();
-                if (wallRenderer != null)
-                {
-                    wallRenderer.material = GameConstants.damagedMaterial;
-                    Debug.Log("Material de la pared cambiado a damagedMaterial.");
-                }
-                else
-                {
-                    Debug.LogWarning("El objeto no tiene un componente Renderer.");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("No se encontró ningún objeto en la posición esperada: " + wallPosition);
-            }
-        }
-
-        // Pared de la derecha
-        if (tile.getWall().getRightHealth() == 0)
-        {
-            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.cellWidth + GameConstants.wallThickness);
-            GameObject wallObject = GameObject.Find(wallPosition.ToString());
-            if (wallObject != null)
-            {
-                Destroy(wallObject);
-                Debug.LogWarning("Pared destruida en la posición: " + wallPosition);
-            }
-        }
-
-        else if (tile.getWall().getRightHealth() == 2)
-        {
-            Vector3 wallPosition = cellPosition + new Vector3(GameConstants.cellHeight / 2, 0, GameConstants.cellWidth + GameConstants.wallThickness);
-            GameObject wallObject = GameObject.Find(wallPosition.ToString());
-            if (wallObject != null)
-            {
-                Renderer wallRenderer = wallObject.GetComponent<Renderer>();
-                if (wallRenderer != null)
-                {
-                    wallRenderer.material = GameConstants.damagedMaterial;
-                    Debug.Log("Material de la pared cambiado a damagedMaterial.");
-                }
-                else
-                {
-                    Debug.LogWarning("El objeto no tiene un componente Renderer.");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("No se encontró ningún objeto en la posición esperada: " + wallPosition);
-            }
-        }
-
-        // Verificar y agregar paredes arriba
+        // Verificar y agregar paredes y puertas arriba
         if (!drawnWalls.Contains((positionX - 1) + "," + positionY + ",2") && !drawnWalls.Contains(positionX + "," + positionY + ",0"))
         {
             if (tile.getWall().getTop() == 1)
@@ -364,7 +278,7 @@ public class WallAndDoorPlacement : MonoBehaviour
             }
         }
 
-        // Verificar y agregar paredes izquierda
+        // Verificar y agregar paredes y puertas izquierda
         if (!drawnWalls.Contains(positionX + "," + (positionY - 1) + ",3") && !drawnWalls.Contains(positionX + "," + positionY + ",1"))
         {
             if (tile.getWall().getLeft() == 1)
@@ -396,7 +310,7 @@ public class WallAndDoorPlacement : MonoBehaviour
             }
         }
 
-        // Verificar y agregar paredes abajo
+        // Verificar y agregar paredes y puertas abajo
         if (!drawnWalls.Contains((positionX + 1) + "," + positionY + ",0") && !drawnWalls.Contains(positionX + "," + positionY + ",2"))
         {
             if (tile.getWall().getBottom() == 1)
@@ -428,7 +342,7 @@ public class WallAndDoorPlacement : MonoBehaviour
             }
         }
 
-        // Verificar y agregar paredes derecha
+        // Verificar y agregar paredes y puertas derecha
         if (!drawnWalls.Contains(positionX + "," + (positionY + 1) + ",1") && !drawnWalls.Contains(positionX + "," + positionY + ",3"))
         {
             if (tile.getWall().getRight() == 1)
@@ -461,6 +375,92 @@ public class WallAndDoorPlacement : MonoBehaviour
         }
 
         CheckCorners(tile, cellPosition);
+    }
+
+    void Update()
+    {
+        if (destroyList.Count == 0)
+        {
+            Debug.Log("No hay POIs para eliminar.");
+            return;
+        }
+        else
+        {
+            foreach (GameObject obj in destroyList)
+            {
+                Debug.Log("Eliminando POI en: " + obj.transform.position);
+                Debug.Log("Name: " + obj.name);
+                if (obj is GameObject)
+                {
+                    Debug.Log("Es un GameObject.");
+                    obj.SetActive(false);
+                    obj.transform.position = new Vector3(1000, 1000, 1000);
+                }
+                Destroy(obj);
+            }
+            destroyList.Clear();
+        }
+        
+
+    }
+
+    void HandleWall(int wallHealth, Vector3 wallPosition)
+    {
+        if (wallDict.TryGetValue(wallPosition, out GameObject wallObject))
+        {
+            if (wallHealth == 0)
+            {
+                Destroy(wallObject);
+                wallDict.Remove(wallPosition);
+                Debug.LogWarning("Pared destruida en la posición: " + wallPosition);
+            }
+            else if (wallHealth == 2)
+            {
+                Renderer wallRenderer = wallObject.GetComponent<Renderer>();
+                if (wallRenderer != null)
+                {
+                    wallRenderer.material = GameConstants.damagedMaterial;
+                    Debug.Log("Material de la pared cambiado a damagedMaterial en: " + wallPosition);
+                }
+                else
+                {
+                    Debug.LogWarning("El objeto no tiene un componente Renderer.");
+                }
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No se encontró ninguna pared en la posición: " + wallPosition);
+        }
+    }
+
+    void HandleDoor(int doorHealth, Vector3 doorPosition)
+    {
+        if (doorDict.TryGetValue(doorPosition, out GameObject doorObject))
+        {
+            if (doorHealth == 0)
+            {
+                Destroy(doorObject);
+                doorDict.Remove(doorPosition);
+                Debug.LogWarning("Puerta destruida en la posición: " + doorPosition);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No se encontró ninguna puerta en la posición: " + doorPosition);
+        }
+    }
+
+    void ReplaceWithOpenedDoor(Vector3 doorPosition, float rotationY)
+    {
+        if (doorDict.TryGetValue(doorPosition, out GameObject doorObject))
+        {
+
+            Destroy(doorObject);
+            doorDict.Remove(doorPosition);
+
+            GameObject doorOpened = Instantiate(doorOpenedPrefab, doorPosition, Quaternion.Euler(0, rotationY, 0));
+        }
     }
 
     public void PlaceWalls()
@@ -577,28 +577,34 @@ public class WallAndDoorPlacement : MonoBehaviour
     void CreateDoor(Vector3 position, float rotationY)
     {
         GameObject doorWall = Instantiate(doorWallPrefab, position, Quaternion.Euler(0, rotationY, 0));
+        // Almacena la puerta en el diccionario
+        if (!doorDict.ContainsKey(position))
+        {
+            doorDict.Add(position, doorWall);
+        }
     }
 
     void CreateWall(Vector3 position, float rotationY, bool outer) // Crear pared
     {
-        if (outer == true) // Si la pared es exterior...
+        GameObject wall = null;
+        if (outer) // Si la pared es exterior...
         {
             // Generar un n�mero aleatorio para decidir qu� objeto instanciar
             int randomIndex = UnityEngine.Random.Range(0, 4);
 
             // Instanciar la pared si el numero es diferente a 0
-            if (randomIndex != 0)
-            {
-                GameObject wall = Instantiate(wallPrefab, position, Quaternion.Euler(0, rotationY, 0));
-            }
-            else
-            {
-                GameObject wall = Instantiate(wallWindowPrefab, position, Quaternion.Euler(0, rotationY, 0));
-            }
+             wall = (randomIndex != 0) ? Instantiate(wallPrefab, position, Quaternion.Euler(0, rotationY, 0)) :
+                                    Instantiate(wallWindowPrefab, position, Quaternion.Euler(0, rotationY, 0));
         }
         else // Si la pared no es exterior...
         {
-            GameObject wall = Instantiate(wallPrefab, position, Quaternion.Euler(0, rotationY, 0));
+            wall = Instantiate(wallPrefab, position, Quaternion.Euler(0, rotationY, 0));
+        }
+
+        // Almacena la pared en el diccionario
+        if (!wallDict.ContainsKey(position))
+        {
+            wallDict.Add(position, wall);
         }
 
     }
@@ -625,10 +631,11 @@ public class WallAndDoorPlacement : MonoBehaviour
         Vector3 startPosition = poiTransform.position;
         while (true)
         {
-            // Calculate the new Y position using a sine wave
-            float newY = startPosition.y + Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
+
             while (poiTransform != null)
             {
+                // Calculate the new Y position using a sine wave
+                float newY = startPosition.y + Mathf.Sin(Time.time * floatSpeed) * floatAmplitude;
                 // Update the POI's position
                 poiTransform.position = new Vector3(poiTransform.position.x, newY, poiTransform.position.z);
                 yield return null;

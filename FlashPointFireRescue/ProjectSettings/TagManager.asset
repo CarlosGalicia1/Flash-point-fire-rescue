@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Smoke
   - POI
+  - Destroy
   layers:
   - Default
   - TransparentFX
