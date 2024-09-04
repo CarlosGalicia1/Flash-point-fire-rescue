@@ -4,13 +4,13 @@ using UnityEngine.SceneManagement; // Importante para reiniciar la escena
 
 public class GameOverScreen : MonoBehaviour
 {
-    public Text damageCounterText; // Texto que mostrará el contador de daño
-    public Button restartButton; // Botón para reiniciar el juego
+    public Text damageCounterText; // Texto que mostrarï¿½ el contador de daï¿½o
+    public Button restartButton; // Botï¿½n para reiniciar el juego
 
-    public void Setup(int damageCounter)
+    public void Setup(string endString)
     {
         gameObject.SetActive(true);
-        damageCounterText.text = "Daño acumulado: " + damageCounter.ToString();
+        damageCounterText.text = endString;
         Time.timeScale = 0f; // Detener el tiempo del juego
     }
     public void RestartGame()
@@ -34,6 +34,6 @@ public class GameOverScreen : MonoBehaviour
 
     private void Start()
     {
-        restartButton.onClick.AddListener(RestartGame); // Asignar el método de reinicio al botón
+        restartButton.onClick.AddListener(RestartGame); // Asignar el mï¿½todo de reinicio al botï¿½n
     }
 }

@@ -101,11 +101,45 @@ public class WebClient : MonoBehaviour
                     Debug.Log($"Current agent step: {stepData.model_step_id}");
                     var tileData = stepData.affected_tiles_data;
                     UpdateTile(tileData);
-                    yield return new WaitForSeconds(0.5f);
+                    Debug.Log($"Tile data damageCounter: {tileData.damageCounter}, Tile data savedVictims: {tileData.savedVictims},  Tile data deadVictims: {tileData.deadVictims}");
+                    yield return new WaitForSeconds(0.125f);
+
+                    GridElementManager gridElementManager = FindObjectOfType<GridElementManager>();
+                    if (gridElementManager != null)
+                    {
+                        gridElementManager.UpdateGridElements(tileData.damageCounter);
+                    }
+                    CoinGridManager coinGridManager = FindObjectOfType<CoinGridManager>();
+                    if (coinGridManager != null)
+                    {
+                        coinGridManager.UpdateGridElements(tileData.savedVictims, tileData.deadVictims);
+                    }
+
+
+                    if (tileData.savedVictims == 7)
+                    {
+                        GameManager gameManager = FindObjectOfType<GameManager>();
+                        string end = "Oro robado!";
+                        gameManager.EndGame(end);
+                        break;
+                    }
+                    else if(tileData.deadVictims == 4)
+                    {
+                        GameManager gameManager = FindObjectOfType<GameManager>();
+                        string end = "4 bolsas de oro perdidas...";
+                        gameManager.EndGame(end);
+                        break;
+                    }
+                    else if (tileData.damageCounter == 24)
+                    {
+                        GameManager gameManager = FindObjectOfType<GameManager>();
+                        string end = "Casa demolida";
+                        gameManager.EndGame(end);
+                        break;
+                    }
                 }
             }
         }
-
     }
 
     void UpdateTile(AffectedTilesData tileData)
@@ -166,6 +200,10 @@ public class WebClient : MonoBehaviour
         public string actions { get; set; }
         public int dx { get; set; }
         public int dy { get; set; }
+        public int damageCounter { get; set; }
+        public string poi { get; set; }
+        public int savedVictims { get; set; }
+        public int deadVictims { get; set; }
     }
 
 

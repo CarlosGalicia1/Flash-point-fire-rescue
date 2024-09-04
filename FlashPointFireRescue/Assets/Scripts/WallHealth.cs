@@ -50,8 +50,6 @@ public class WallHealth : MonoBehaviour
     }
     public void EndSimulation()
     {
-        // Detiene el juego o realiza las acciones necesarias
-        GameManager gameManager = FindObjectOfType<GameManager>();
-        gameManager.EndGame(); // Llamar a EndGame en lugar de Application.Quit()
+        return;
     }
 }

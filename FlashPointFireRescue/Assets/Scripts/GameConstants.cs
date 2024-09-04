@@ -14,6 +14,8 @@ public class GameConstants : MonoBehaviour
     public static float wallThickness = 0.5f; // Altura de cada celda
     public static float minuteToRealTime = 1f; // Proporcion minuto del juego vs minuto real
     public static Color grayColor = new Color(0.3f, 0.3f, 0.3f, 1f); // Color gris
+    public static Color whiteColor = new Color(1f, 1f, 1f, 1f); // Color blanco
+    public static Color redColor = new Color(.7f, 0f, 0f, 1f); // Color blanco
     public static float rotationSpeed = 500.0f; // Velocidad de rotacion horizontal de la camara
     public static float zoomScale = 10.0f; // Velocidad de zoom de la camara
     public static float zoomMin = 10f; // Limite minimo de zoom
