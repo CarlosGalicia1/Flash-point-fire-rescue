@@ -221,7 +221,7 @@ public class WallAndDoorPlacement : MonoBehaviour
             CreatePOI(positionX + 1, positionY + 1);
         }
 
-        else if (!tile.getHasPOI() && tile.getFireFighters().Count > 0)
+        else if (!tile.getHasPOI() && tile.getFireFighters().Count > 0 || tile.getFireStatus() == 2)
         {
             Debug.Log("Poi revelado en la posicion: " + (positionX+1) + ", " + (positionY+1));
             float x = 7f + ((positionX) * (10f));
