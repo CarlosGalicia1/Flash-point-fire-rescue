@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using UnityEditor;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class WebClient : MonoBehaviour
 {
@@ -104,16 +107,18 @@ public class WebClient : MonoBehaviour
                     Debug.Log($"Tile data damageCounter: {tileData.damageCounter}, Tile data savedVictims: {tileData.savedVictims},  Tile data deadVictims: {tileData.deadVictims}");
                     yield return new WaitForSeconds(0.125f);
 
-                    GridElementManager gridElementManager = FindObjectOfType<GridElementManager>();
-                    if (gridElementManager != null)
-                    {
-                        gridElementManager.UpdateGridElements(tileData.damageCounter);
-                    }
+
                     CoinGridManager coinGridManager = FindObjectOfType<CoinGridManager>();
                     if (coinGridManager != null)
                     {
                         coinGridManager.UpdateGridElements(tileData.savedVictims, tileData.deadVictims);
                     }
+                    GridElementManager gridElementManager = FindObjectOfType<GridElementManager>();
+                    if (gridElementManager != null)
+                    {
+                        gridElementManager.UpdateGridElements(tileData.damageCounter);
+                    }
+                    
 
 
                     if (tileData.savedVictims == 7)
@@ -157,7 +162,11 @@ public class WebClient : MonoBehaviour
     {
         Debug.Log("Sending first request...");
         Vector3 fakePos = new Vector3(3.44f, 0, -15.707f);
+        #if UNITY_EDITOR
         string json = EditorJsonUtility.ToJson(fakePos);
+        #else
+        string json = JsonUtility.ToJson(fakePos);
+        #endif
         StartCoroutine(SendData(json));
         Debug.Log("First request sent. Waiting to send second request...");
     }

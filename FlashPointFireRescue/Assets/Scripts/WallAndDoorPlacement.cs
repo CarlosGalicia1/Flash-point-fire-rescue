@@ -117,25 +117,42 @@ public class WallAndDoorPlacement : MonoBehaviour
 
         if (tile.getFireFighters().Count > 0)
         {
+            int totalFireFighters = tile.getFireFighters().Count;
+            float centerX = ((positionX) * GameConstants.cellWidth) + (GameConstants.cellWidth / 2);
+            float centerZ = ((positionY) * GameConstants.cellHeight) + (GameConstants.cellHeight / 2);
+            int index = 0;
+
             foreach (int firefighter in tile.getFireFighters())
             {
-                float x = ((positionX) * GameConstants.cellWidth) + (GameConstants.cellWidth / 2);
-                float z = ((positionY) * GameConstants.cellHeight) + (GameConstants.cellHeight / 2);
-                Vector3 position = new Vector3(x, 2f, z);
+                float x, z;
 
+                if (totalFireFighters == 1)
+                {
+                    // Si solo hay un firefighter, colócalo en el centro
+                    x = centerX;
+                    z = centerZ;
+                }
+                else
+                {
+                    // Si hay más de un firefighter, colócalos alrededor del centro
+                    float angle = index * Mathf.PI * 2 / totalFireFighters; // Calcula el ángulo para la posición
+                    float radius = GameConstants.cellWidth / 4f; // Radio del círculo alrededor del centro
+                    x = centerX + Mathf.Cos(angle) * radius;
+                    z = centerZ + Mathf.Sin(angle) * radius;
+                }
+
+                Vector3 position = new Vector3(x, 2f, z);
                 GameObject agent = null;
+
                 switch (firefighter)
                 {
                     case 0:
-                        // Destruir la instancia anterior del agente, no el prefab
                         if (redAgentInstance != null)
                         {
                             Destroy(redAgentInstance);
                         }
-                        // Instanciar un nuevo agente y almacenar la referencia
                         redAgentInstance = Instantiate(redAgentPrefab, position, Quaternion.identity);
                         break;
-
                     case 1:
                         if (blueAgentInstance != null)
                         {
@@ -143,7 +160,6 @@ public class WallAndDoorPlacement : MonoBehaviour
                         }
                         blueAgentInstance = Instantiate(blueAgentPrefab, position, Quaternion.identity);
                         break;
-
                     case 2:
                         if (greenAgentInstance != null)
                         {
@@ -151,7 +167,6 @@ public class WallAndDoorPlacement : MonoBehaviour
                         }
                         greenAgentInstance = Instantiate(greenAgentPrefab, position, Quaternion.identity);
                         break;
-
                     case 3:
                         if (yellowAgentInstance != null)
                         {
@@ -159,7 +174,6 @@ public class WallAndDoorPlacement : MonoBehaviour
                         }
                         yellowAgentInstance = Instantiate(yellowAgentPrefab, position, Quaternion.identity);
                         break;
-
                     case 4:
                         if (whiteAgentInstance != null)
                         {
@@ -167,7 +181,6 @@ public class WallAndDoorPlacement : MonoBehaviour
                         }
                         whiteAgentInstance = Instantiate(whiteAgentPrefab, position, Quaternion.identity);
                         break;
-
                     case 5:
                         if (purpleAgentInstance != null)
                         {
@@ -176,8 +189,9 @@ public class WallAndDoorPlacement : MonoBehaviour
                         purpleAgentInstance = Instantiate(purpleAgentPrefab, position, Quaternion.identity);
                         break;
                 }
+                index++;
             }
-        }
+    }
 
         if (tile.getFireStatus() != 0)
         {
