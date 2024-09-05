@@ -4565,8 +4565,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0ca051729a6ba44392d781bd20bfa36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageCounterText: {fileID: 0}
-  restartButton: {fileID: 0}
+  damageCounterText: {fileID: 485534943}
+  restartButton: {fileID: 246046272}
 --- !u!1 &1361865253
 GameObject:
   m_ObjectHideFlags: 0
@@ -4769,7 +4769,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e849bb520dc1d4348841cb3d92aa5d28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameOverScreen: {fileID: 0}
+  gameOverScreen: {fileID: 1286410514}
 --- !u!1 &1483220882
 GameObject:
   m_ObjectHideFlags: 0
