@@ -211,18 +211,6 @@ class FireFighter(Agent):
         print(f"Energy: {self.energy}")
         print(f"Len(moves to poi): {len(self.movesToGoal)}")
         while self.energy > 0 and self.move_index < len(self.movesToGoal) and self.canAdvance == True:
-            if self.pos == self.nearestPOI:
-                self.move_index = 1  # Reset move index
-                self.calculatenearest()  # Calculate the nearest entry point
-                self.dijkstra_to_nearest(self.model.graph, self.pos, self.nearestEntrypoint)  # Find the path to the nearest entry point
-                goalPos = self.nearestEntrypoint  # Update goal position to the nearest entry point
-            # If at the nearest entry point, drop the victim and find the nearest POI
-            elif self.pos == self.nearestEntrypoint:
-                self.move_index = 1  # Reset move index
-                self.dropVictim()  # Drop the victim at the entry point
-                self.calculatenearest()  # Calculate the nearest POI
-                self.dijkstra_to_nearest(self.model.graph, self.pos, self.nearestPOI)  # Find the path to the nearest POI
-                goalPos = self.nearestPOI  # Update goal position to the nearest POI
 
             move = self.movesToGoal[self.move_index]
             # itera en la lista de movesToGoal empezando por el segundo elemento
@@ -299,18 +287,6 @@ class FireFighter(Agent):
                             self.canAdvance = False
 
             print("Energy: ", self.energy)
-            if self.pos == self.nearestPOI:
-                self.move_index = 1  # Reset move index
-                self.calculatenearest()  # Calculate the nearest entry point
-                self.dijkstra_to_nearest(self.model.graph, self.pos, self.nearestEntrypoint)  # Find the path to the nearest entry point
-                goalPos = self.nearestEntrypoint  # Update goal position to the nearest entry point
-            # If at the nearest entry point, drop the victim and find the nearest POI
-            elif self.pos == self.nearestEntrypoint:
-                self.move_index = 1  # Reset move index
-                self.dropVictim()  # Drop the victim at the entry point
-                self.calculatenearest()  # Calculate the nearest POI
-                self.dijkstra_to_nearest(self.model.graph, self.pos, self.nearestPOI)  # Find the path to the nearest POI
-                goalPos = self.nearestPOI  # Update goal position to the nearest POI
 
         if self.pos == self.nearestPOI:
             self.move_index = 1
